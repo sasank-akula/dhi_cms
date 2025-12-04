@@ -16,9 +16,9 @@ entity Attributes : cuid, managed {
     value        : String;
     regex        : String;
     status       : String;
-    tags         : String;
-    multilingual : Boolean;
-    schemaJson   : LargeString;
+    // tags         : String;
+    // multilingual : Boolean;
+    // schemaJson   : LargeString;
     contracts    : Association to many ContractsAttributes
                        on contracts.attributes = $self;
     title        : String;
@@ -31,9 +31,9 @@ entity AttributeGroupAttribute : cuid, managed {
     attributeGroup  : Association to Attribute_Groups;
     attribute       : Association to Attributes;
     sortID          : Integer;
-    isPortalEnabled : Boolean default true;
+   
 }
-
+  @assert.unique: {uniqueAttributeGroupName: [name]}
 entity Attribute_Groups : cuid, managed {
     attribute_group_id : String;
     name               : String(100) @mandatory;
@@ -43,7 +43,7 @@ entity Attribute_Groups : cuid, managed {
                              on templates.attribute_groups = $self;
     attributes         : Composition of many AttributeGroupAttribute
                              on attributes.attributeGroup = $self;
-    role               : String(100);
+// role               : String(100);
 }
 
 entity TemplatesAttributeGroups : cuid, managed {
@@ -70,9 +70,9 @@ entity ContractsAttributes : cuid, managed {
     key attributes       : Association to Attributes;
         valueJson        : localized LargeString;
 }
-
+@assert.unique: {uniqueProductName: [name]}
 entity Contracts : cuid, managed {
-    product_id       : String(20);
+    contract_id      : String(30);
     name             : localized String
                                                 @mandatory;
     description      : localized String;
@@ -80,7 +80,6 @@ entity Contracts : cuid, managed {
     start_date       : Date;
     end_date         : Date;
     is_visible       : Boolean;
-
 
     templates        : Association to Templates @assert.target;
     attachments      : Composition of many Attachments
@@ -116,9 +115,9 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
     left join AttributeGroupAttribute as _AttributeGroupsAttr
         on _Templates.attribute_groups.ID = _AttributeGroupsAttr.attributeGroup.ID
     left join Attribute_Groups as _AttributeGroups
-        on _Templates.attribute_groups.ID = _AttributeGroups.ID
+        on _Templates.attribute_groups.ID = _AttributeGroups.attribute_group_id
     left join Attributes as _Attributes
-        on _AttributeGroupsAttr.attribute.ID = _Attributes.ID
+        on _AttributeGroupsAttr.attribute.ID = _Attributes.attribute_id
     {
         key _Templates.templates.ID           as Template_ID,
             _Templates.templates.template_id  as Template_No,
@@ -127,7 +126,6 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
 
         key _Templates.attribute_groups.ID    as Attribute_Groups_ID,
             _AttributeGroups.name             as Attribute_Group_Name,
-            _AttributeGroups.role             as Attribute_Group_Role,
             _Templates.sortID                 as AttributeGroupOrder,
 
         key _AttributeGroupsAttr.attribute.ID as Attribute_ID,

@@ -1,1 +1,53 @@
-ID,attribute_id,name,desc,alias,type,value,regex,status,tags,multilingual,schemaJson,title,maxlength,minlength,is_mandatory,createdAt,createdBy,modifiedAt,modifiedBy
+ID,attribute_id,name,desc,alias,type,value,regex,status,title,maxlength,minlength,is_mandatory,createdAt,createdBy,modifiedAt,modifiedBy
+1,ATT-101,Contract Title,Title or subject of the agreement,ContractTitle,Input,,.*,Active,Contract Title,200,1,true,2025-12-04,admin,2025-12-04,admin
+2,ATT-102,Contract Number Reference ID,Unique identifier for the contract,ContractNumber,Input,,^[A-Za-z0-9/_-]+$,Active,Contract Number,100,1,true,2025-12-04,admin,2025-12-04,admin
+3,ATT-103,Contract Type,Type of contract such as Agreement NDA MOU etc,ContractType,Input,,.*,Active,Contract Type,100,1,true,2025-12-04,admin,2025-12-04,admin
+4,ATT-104,Related Master Agreement,Reference to framework or umbrella agreements,RelatedMasterAgreement,Input,,.*,Active,Related Master Agreement,200,0,false,2025-12-04,admin,2025-12-04,admin
+5,ATT-105,Project Business Unit,Division or project linked to the contract,ProjectBusinessUnit,Input,,.*,Active,Project Business Unit,150,0,false,2025-12-04,admin,2025-12-04,admin
+
+6,ATT-106,Contracting Entity,DHI legal entity executing the agreement,ContractingEntity,Input,,.*,Active,Contracting Entity,150,1,true,2025-12-04,admin,2025-12-04,admin
+7,ATT-107,Counterparty Legal Names,Full legal names of all counterparties,CounterpartyLegalNames,MultiInput,,.*,Active,Counterparty Names,250,1,true,2025-12-04,admin,2025-12-04,admin
+8,ATT-108,Counterparty Type,Company individual JV agency etc,CounterpartyType,Input,,.*,Active,Counterparty Type,50,1,true,2025-12-04,admin,2025-12-04,admin
+9,ATT-109,Counterparty Registered Address,Registered address of counterparty,CounterpartyAddress,Input,,.*,Active,Counterparty Address,300,0,false,2025-12-04,admin,2025-12-04,admin
+10,ATT-110,Country of Incorporation,Country where counterparty is incorporated,CountryOfIncorporation,Input,,^[A-Za-z ]+$,Active,Country of Incorporation,60,2,true,2025-12-04,admin,2025-12-04,admin
+11,ATT-111,Counterparty Contact Person,Name designation email phone of contact,CounterpartyContact,Input,,.*,Active,Counterparty Contact Person,200,0,false,2025-12-04,admin,2025-12-04,admin
+
+12,ATT-112,Effective Date,Date the contract becomes effective,EffectiveDate,DatePicker,,^\d{4}-\d{2}-\d{2}$,Active,Effective Date,10,10,true,2025-12-04,admin,2025-12-04,admin
+13,ATT-113,Execution Signature Date,Date the contract is signed,SignatureDate,DatePicker,,^\d{4}-\d{2}-\d{2}$,Active,Signature Date,10,10,false,2025-12-04,admin,2025-12-04,admin
+14,ATT-114,Commencement Date,Date when obligations start,CommencementDate,DatePicker,,^\d{4}-\d{2}-\d{2}$,Active,Commencement Date,10,10,false,2025-12-04,admin,2025-12-04,admin
+15,ATT-115,Expiry Date,Contract end date,ExpiryDate,DatePicker,,^\d{4}-\d{2}-\d{2}$,Active,Expiry Date,10,10,true,2025-12-04,admin,2025-12-04,admin
+16,ATT-116,Renewal Option,Renewal terms and conditions,RenewalOption,Input,,.*,Active,Renewal Option,200,0,false,2025-12-04,admin,2025-12-04,admin
+17,ATT-117,Notice Period,Notice period for termination or renewal,NoticePeriod,Input,,^[0-9]+$,Active,Notice Period,10,1,false,2025-12-04,admin,2025-12-04,admin
+18,ATT-118,Key Milestone Dates,Important contract milestones,KeyMilestones,MultiInput,,.*,Active,Key Milestone Dates,250,0,false,2025-12-04,admin,2025-12-04,admin
+
+19,ATT-119,Contract Value,Total contract value,ContractValue,Input,,^[0-9.]+$,Active,Contract Value,20,1,true,2025-12-04,admin,2025-12-04,admin
+20,ATT-120,Currency,Currency type such as USD BTN INR,Currency,Input,,^[A-Z]{3}$,Active,Currency,3,3,true,2025-12-04,admin,2025-12-04,admin
+21,ATT-121,Payment Terms,Payment structure such as Net30 milestone based,PaymentTerms,Input,,.*,Active,Payment Terms,100,0,false,2025-12-04,admin,2025-12-04,admin
+22,ATT-122,Applicable Taxes Duties,Taxes or duties applicable,TaxesDuties,Input,,.*,Active,Applicable Taxes Duties,100,0,false,2025-12-04,admin,2025-12-04,admin
+23,ATT-123,Performance Security Retention,Security deposit or retention,PerformanceSecurity,Input,,^[0-9.]*$,Active,Performance Security Retention,20,0,false,2025-12-04,admin,2025-12-04,admin
+24,ATT-124,Price Escalation Revision Clause,Clause for price change if applicable,PriceEscalation,Input,,.*,Active,Price Escalation Revision Clause,200,0,false,2025-12-04,admin,2025-12-04,admin
+
+25,ATT-125,Deliverables Services Summary,Summary of deliverables,DeliverablesSummary,Input,,.*,Active,Deliverables Summary,300,1,true,2025-12-04,admin,2025-12-04,admin
+26,ATT-126,Performance Standards KPIs,Performance standards and KPIs,PerformanceKPIs,Input,,.*,Active,Performance Standards KPIs,200,0,false,2025-12-04,admin,2025-12-04,admin
+27,ATT-127,Reporting Requirements,Required reports and frequency,ReportingRequirements,Input,,.*,Active,Reporting Requirements,200,0,false,2025-12-04,admin,2025-12-04,admin
+28,ATT-128,Insurance Requirements,Insurance obligations required,InsuranceRequirements,Input,,.*,Active,Insurance Requirements,150,0,false,2025-12-04,admin,2025-12-04,admin
+29,ATT-129,Subcontracting Allowed,Whether subcontracting is permitted,SubcontractingAllowed,CheckBox,,^(true|false)$,Active,Subcontracting Allowed,5,4,false,2025-12-04,admin,2025-12-04,admin
+
+30,ATT-130,Governing Law,Law governing the contract,GoverningLaw,Input,,.*,Active,Governing Law,100,1,true,2025-12-04,admin,2025-12-04,admin
+31,ATT-131,Dispute Resolution Mechanism,Details of arbitration or court,DisputeResolution,Input,,.*,Active,Dispute Resolution Mechanism,200,0,false,2025-12-04,admin,2025-12-04,admin
+32,ATT-132,Limitation of Liability,Liability caps agreed in contract,LimitationLiability,Input,,.*,Active,Limitation of Liability,200,0,false,2025-12-04,admin,2025-12-04,admin
+33,ATT-133,Confidentiality Obligations,Confidentiality terms,Confidentiality,Input,,.*,Active,Confidentiality Obligations,150,0,false,2025-12-04,admin,2025-12-04,admin
+34,ATT-134,Intellectual Property Rights,IP ownership terms,IPRights,Input,,.*,Active,Intellectual Property Rights,200,0,false,2025-12-04,admin,2025-12-04,admin
+35,ATT-135,Compliance Requirements,Compliance obligations such as AML ESG,ComplianceRequirements,Input,,.*,Active,Compliance Requirements,200,0,false,2025-12-04,admin,2025-12-04,admin
+
+36,ATT-136,Contract Owner,Internal owner responsible for contract,ContractOwner,Input,,.*,Active,Contract Owner,100,1,true,2025-12-04,admin,2025-12-04,admin
+37,ATT-137,Legal Reviewer Approver,Person approving legal review,LegalReviewer,Input,,.*,Active,Legal Reviewer Approver,100,1,true,2025-12-04,admin,2025-12-04,admin
+38,ATT-138,Commercial Approver,Person approving commercial aspects,CommercialApprover,Input,,.*,Active,Commercial Approver,100,1,true,2025-12-04,admin,2025-12-04,admin
+39,ATT-139,Current Status,Stage such as Draft Signed Active,CurrentStatus,Input,,.*,Active,Current Status,20,1,true,2025-12-04,admin,2025-12-04,admin
+40,ATT-140,Amendment Variation,References to addenda or variations,Amendments,MultiInput,,.*,Active,Amendment Variation,200,0,false,2025-12-04,admin,2025-12-04,admin
+41,ATT-141,Linked Documents,Annexures schedules and related documents,LinkedDocuments,MultiInput,,.*,Active,Linked Documents,250,0,false,2025-12-04,admin,2025-12-04,admin
+
+42,ATT-142,Renewal Alert Period,Number of days before renewal alert,RenewalAlertPeriod,Input,,^[0-9]+$,Active,Renewal Alert Period,10,1,false,2025-12-04,admin,2025-12-04,admin
+43,ATT-143,Performance Obligation Review Dates,Review dates for obligations,ReviewDates,MultiInput,,.*,Active,Performance Obligation Review Dates,150,0,false,2025-12-04,admin,2025-12-04,admin
+44,ATT-144,Payment Milestone Triggers,Triggers for payment milestones,PaymentMilestones,MultiInput,,.*,Active,Payment Milestone Triggers,150,0,false,2025-12-04,admin,2025-12-04,admin
+45,ATT-145,Audit Compliance Check Dates,Dates for audit or compliance reviews,AuditCheckDates,MultiInput,,.*,Active,Audit Compliance Check Dates,150,0,false,2025-12-04,admin,2025-12-04,admin

@@ -9,16 +9,24 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "@sap/cds-dk": "^9"
+    "@sap/cds-dk": "^9",
+    "cds-plugin-ui5": "^0.13.0",
+    "rimraf": "^5.0.5",
+    "mbt": "^1.2.29"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "watch-cms_admin": "cds watch --open com.dhi.cms.cmsadmin/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy dhi_cms --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
+    "watch-cms_requester": "cds watch --open com.dhi.cms.cmsrequester/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "cds": {
     "requires": {
-      "auth":"dummy",
-        "db": {
+      "auth": "dummy",
+      "db": {
         "[production]": {
           "kind": "hana",
           "vcap": {
@@ -43,5 +51,8 @@
         }
       }
     }
-  }
+  },
+  "workspaces": [
+    "app/*"
+  ]
 }

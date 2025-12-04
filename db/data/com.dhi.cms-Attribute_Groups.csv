@@ -1,1 +1,9 @@
-ID,attribute_group_id,name,desc,alias,role,createdAt,createdBy,modifiedAt,modifiedBy
+ID,attribute_group_id,name,desc,alias,createdAt,createdBy,modifiedAt,modifiedBy
+1,AG-101,Contract Identification,Group for identifying contract reference and classification details,ContractIdentification,2025-12-04,admin,2025-12-04,admin
+2,AG-102,Parties,Group containing information about involved parties and stakeholder identities,Parties,2025-12-04,admin,2025-12-04,admin
+3,AG-103,Dates,Group for maintaining key contract dates and schedule milestones,Dates,2025-12-04,admin,2025-12-04,admin
+4,AG-104,Financials,Group holding contract financial terms valuation and payment structure,Financials,2025-12-04,admin,2025-12-04,admin
+5,AG-105,Obligations & Deliverables,Group defining responsibilities performance requirements and deliverables,ObligationsDeliverables,2025-12-04,admin,2025-12-04,admin
+6,AG-106,Legal and Risk Provisions,Group covering legal clauses compliance terms and risk provisions,LegalRiskProvisions,2025-12-04,admin,2025-12-04,admin
+7,AG-107,Lifecycle Management,Group tracking all stages of contract lifecycle and status workflow,LifecycleManagement,2025-12-04,admin,2025-12-04,admin
+8,AG-108,Alerts & Monitoring,Group defining alerts thresholds and monitoring rules,AlertsMonitoring,2025-12-04,admin,2025-12-04,admin

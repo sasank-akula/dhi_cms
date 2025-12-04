@@ -1,0 +1,47 @@
+{
+  "name": "dhi_cms",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "dependencies": {
+    "@cap-js/hana": "^2",
+    "@sap/cds": "^9",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": "^9"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "private": true,
+  "cds": {
+    "requires": {
+      "auth":"dummy",
+        "db": {
+        "[production]": {
+          "kind": "hana",
+          "vcap": {
+            "label": "hana",
+            "name": "dhi_cms-db"
+          },
+          "pool": {
+            "max": 1400,
+            "min": 100
+          }
+        },
+        "[development]": {
+          "kind": "hana-cloud",
+          "vcap": {
+            "label": "hana",
+            "name": "dhi_cms-db"
+          },
+          "pool": {
+            "max": 1400,
+            "min": 100
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+    "types": [
+        {
+            "type": "number",
+            "value": "Number"
+        },
+        {
+            "type": "integer",
+            "value": "Integer"
+        },
+        {
+            "type": "string",
+            "value": "String"
+        },
+        {
+            "type": "derived",
+            "value": "Derived"
+        },
+        {
+            "type": "boolean",
+            "value": "Boolean"
+        },
+        {
+            "type": "array",
+            "value": "Array"
+        },
+        {
+            "type": "association",
+            "value": "Association"
+        }
+    ]
+}

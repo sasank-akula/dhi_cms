@@ -24,7 +24,7 @@
                     <table:Column  id="attibuteId" filterProperty="attribute_id" sortProperty="attribute_id" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attributes_ID}" wrapping="true"/>
                         <table:template>
-                            <Text text="{attribute_id}"  wrapping="false" textAlign="Left" width="100%"/>
+                            <Text text="{ID}"  wrapping="false" textAlign="Left" width="100%"/>
                            
                         </table:template>
                     </table:Column>

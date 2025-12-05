@@ -16,9 +16,9 @@
                         <OverflowToolbar class="customToolbar" height="3rem" design="Transparent">
                             <Title class="sapUiSmallMarginBegin" titleStyle="H4" text="{i18n>Create_Attribute_Title}" id="createAttributeTitle" />
                             <ToolbarSpacer/>
-                            <Button class="sapUiTinyMarginEnd" type="Neutral" app:footer="ShowPane" icon="sap-icon://history" press="onVersionHistory" tooltip="{i18n>Create_Attribute_Version_History}"/>
+                            <!-- <Button class="sapUiTinyMarginEnd" type="Neutral" app:footer="ShowPane" icon="sap-icon://history" press="onVersionHistory" tooltip="{i18n>Create_Attribute_Version_History}"/> -->
                             <ToolbarSeparator class="sapUiSmallMarginEnd"/>
-                            <Button id="btnDoneAttribute" class="sapUiTinyMarginEnd" type="Neutral" text="{i18n>Create_Attribute_Done}" icon="sap-icon://complete" press="onNavigation('Attributes')"/>
+                            <!-- <Button id="btnDoneAttribute" class="sapUiTinyMarginEnd" type="Neutral" text="{i18n>Create_Attribute_Done}" icon="sap-icon://complete" press="onNavigation('Attributes')"/> -->
                             <Button id="btnSaveAttribute" text="{i18n>Create_Attribute_Save}" type="Emphasized" icon="sap-icon://save" press="onSave" />
                             <Button id="btnCancelAttribute" class="sapUiSmallMarginEnd" text="{i18n>Create_Attribute_Cancel}" icon="sap-icon://decline" press="onNavigation('Attributes')"/>
                         </OverflowToolbar>
@@ -34,7 +34,7 @@
 
                                     <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_ID}" labelFor="attributeIdInput"/>
-                                        <Input id="attributeIdInput" placeholder="{i18n>Create_Attribute_Attribute_ID_Placeholder}" editable="false" value="{appModel>/Attributes/attribute_id}"/>
+                                        <Input id="attributeIdInput" editable="false" placeholder="{i18n>Create_Attribute_Attribute_ID_Placeholder}" value="{appModel>/Attributes/ID}"/>
                                     </VBox>
 
                                     <VBox class="sapUiMediumMarginBottom">
@@ -60,10 +60,10 @@
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Is_Mandatory}" labelFor="isMandatorySwitch"/>
                                             <Switch id="isMandatorySwitch" customTextOn="Yes" customTextOff="No" state="{appModel>/Attributes/is_mandatory}"/>
                                         </VBox>
-                                        <VBox alignItems="End">
+                                        <!-- <VBox alignItems="End">
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Integration}" labelFor="integrationSwitch"/>
                                             <Switch id="integrationSwitch" customTextOn="Yes" customTextOff="No" state="{appModel>/isIntegrationVisible}" change="onIntegrationChange"/>
-                                        </VBox>
+                                        </VBox> -->
                                     </HBox>
                                 </VBox>
                             </f:GridListItem>
@@ -97,10 +97,10 @@
                                         </ComboBox>
                                     </VBox>
 
-                                    <VBox class="sapUiMediumMarginBottom">
+                                    <!-- <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Tags}" labelFor="multiInputTags"/>
                                         <MultiInput id="multiInputTags" showSuggestion="false" showValueHelp="false" change="onTagsChange"/>
-                                    </VBox>
+                                    </VBox> -->
 
                                     <HBox alignItems="Start" justifyContent="SpaceBetween">
                                         <VBox>
@@ -131,7 +131,7 @@
                                 </VBox>
                             </f:GridListItem>
                         </f:GridList>
-                        <f:GridList class="sapUiMediumMarginBegin sapUiSmallMarginTop" width="96%" visible="{appModel>/isIntegrationVisible}">
+                        <!-- <f:GridList class="sapUiMediumMarginBegin sapUiSmallMarginTop" width="96%" visible="{appModel>/isIntegrationVisible}">
                             <f:GridListItem>
                                 <f:layoutData>
                                     <grid:ResponsiveColumnItemLayoutData columns="auto" />
@@ -157,16 +157,16 @@
                                     </HBox>
                                 </VBox>
                             </f:GridListItem>
-                        </f:GridList>
+                        </f:GridList> -->
                     </content>
                 </Page>
             </l:SplitPane>
-            <l:SplitPane requiredParentWidth="600">
+            <!-- <l:SplitPane requiredParentWidth="600">
                 <l:layoutData>
                     <l:SplitterLayoutData size="{appModel>/showVersionHistory}" />
                 </l:layoutData>
                 <core:Fragment fragmentName="com.dhi.cms.cmsadmin.fragments.VersionHistory" type="XML" />
-            </l:SplitPane>
+            </l:SplitPane> -->
         </l:PaneContainer>
     </l:ResponsiveSplitter>
 </mvc:View>

@@ -116,9 +116,9 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
     left join AttributeGroupAttribute as _AttributeGroupsAttr
         on _Templates.attribute_groups.ID = _AttributeGroupsAttr.attributeGroup.ID
     left join Attribute_Groups as _AttributeGroups
-        on _Templates.attribute_groups.ID = _AttributeGroups.attribute_group_id
+        on _Templates.attribute_groups.ID = _AttributeGroups.ID
     left join Attributes as _Attributes
-        on _AttributeGroupsAttr.attribute.ID = _Attributes.attribute_id
+        on _AttributeGroupsAttr.attribute.ID = _Attributes.ID
     {
         key _Templates.templates.ID           as Template_ID,
             _Templates.templates.template_id  as Template_No,
@@ -126,7 +126,7 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
             _Templates.templates.desc         as Template_Description,
 
         key _Templates.attribute_groups.ID    as Attribute_Groups_ID,
-            _AttributeGroups.name             as Attribute_Group_Name,
+            _AttributeGroups.name           as Attribute_Group_Name,
             _Templates.sortID                 as AttributeGroupOrder,
 
         key _AttributeGroupsAttr.attribute.ID as Attribute_ID,
@@ -144,7 +144,7 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
         define view AttributeGroupCatalogue as
         select from Attribute_Groups as _AttributeGroups
         left join TemplatesAttributeGroups as _templateGroups
-            on _AttributeGroups.attribute_group_id = _templateGroups.attribute_groups.ID
+            on _AttributeGroups.ID = _templateGroups.attribute_groups.ID
         {
             key _AttributeGroups.ID                   as ID,
             key _AttributeGroups.attribute_group_id   as attribute_group_id,

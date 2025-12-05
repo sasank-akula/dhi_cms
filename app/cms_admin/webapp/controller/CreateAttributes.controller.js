@@ -21,40 +21,42 @@ sap.ui.define([
                 this.attributeId = oEvent.getParameter("arguments").attributeId;
                 var isEditMode = !!this.attributeId;
                 this.getModel("appModel").setProperty("/isEditMode", isEditMode);
-                this._updateBreadcrumbs(sRouteName);
+                // this._updateBreadcrumbs(sRouteName);
                 var sTitle = isEditMode 
                     ? this.getResourceBundle().getText("Update_Attribute_Title") 
                     : this.getResourceBundle().getText("Create_Attribute_Title");
                 this.getView().byId("createAttributeTitle").setText(sTitle);
                 if (!this.attributeId) {
                     this.getModel("appModel").setProperty("/Attributes", {});
-                    this.getModel("appModel").setProperty("/isIntegrationVisible", false);
+                    
                 } else {
                     this._fnReadAttributes(this.attributeId);
                 }
-                this._fnReadAssociation();
+                // this._fnReadAssociation();
                 this._fnRegisterMessageManager();
-                this.getModel("appModel").setProperty("/showVersionHistory", "0%");
+                // this.getModel("appModel").setProperty("/showVersionHistory", "0%");
             },
 
             _fnReadAttributes: function (attributeId) {
+                debugger
                 var that = this;
                 this.getModel("oDataV2").read("/Attributes(" + attributeId + ")", {
-                    urlParameters: {
-                        "$expand": "integration"
-                    },
+                    // urlParameters: {
+                    //     "$expand": "integration"
+                    // },
                     success: function (oData, oResponce) {
-                        var aSystems = oData.integration.results.map(function (item) {
-                            return item.system;
-                        });
+                        debugger
+                        // var aSystems = oData.integration.results.map(function (item) {
+                        //     return item.system;
+                        // });
                         that.getModel("appModel").setProperty("/Attributes", oData);
-                        that.getModel("appModel").setProperty("/Client", aSystems);
-                        that.setTags(oData.tags);
-                        if (oData.integration.results.length !== 0) {
-                            that.getModel("appModel").setProperty("/isIntegrationVisible", true);
-                        } else {
-                            that.getModel("appModel").setProperty("/isIntegrationVisible", false);
-                        }
+                        // that.getModel("appModel").setProperty("/Client", aSystems);
+                        // that.setTags(oData.tags);
+                        // if (oData.integration.results.length !== 0) {
+                        //     that.getModel("appModel").setProperty("/isIntegrationVisible", true);
+                        // } else {
+                        //     that.getModel("appModel").setProperty("/isIntegrationVisible", false);
+                        // }
                     },
                     error: function (oError) {
                         MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
@@ -105,6 +107,7 @@ sap.ui.define([
                     this.byId("AttributeTypeSelect").setValueState("None");
                     this.byId("aliasNameAttrInput").setValueState("None");
                     this.byId("associationsSelect").setValueState("None");
+                    this.onNavigation('Attributes')
                     // this.resetValueStates("Save");
                 }
             },
@@ -138,7 +141,6 @@ sap.ui.define([
                 var oBundle = this.getResourceBundle();
                 var oODataModel = this.getModel();
                 var oModel = this.getModel("appModel").getData().Attributes;
-                var selectedClients = this.byId("clientSelect").getSelectedKeys();
                 var payload = {
                     "ID": oModel.ID,
                     "attribute_id": oModel.attribute_id,
@@ -149,15 +151,11 @@ sap.ui.define([
                     "value": oModel.value,
                     "regex": oModel.regex,
                     "status": oModel.status,
-                    "tags": oModel.tags,
                     "is_mandatory": this.byId("isMandatorySwitch").getState(),
                     "minlength": oModel.minlength,
-                    "maxlength": oModel.maxlength,
-                    "integration": []
+                    "maxlength": oModel.maxlength
                 };
-                selectedClients.forEach(function (value) {
-                    payload.integration.push({ system: value });
-                });
+               
                 //Creating a new attribute.
                 if (oModel.ID === undefined) {
                     var oListBinding = oODataModel.bindList("/Attributes", undefined, undefined, undefined, undefined);
@@ -213,70 +211,70 @@ sap.ui.define([
                 }
             },
 
-            setTags: function (tags) {
-                var multiInputTags = this.byId("multiInputTags");
+            // setTags: function (tags) {
+            //     var multiInputTags = this.byId("multiInputTags");
 
-                if (tags !== undefined && tags !== null && tags !== "") {
-                    multiInputTags.setTokens([
-                        new Token({ text: tags, key: tags })
-                    ]);
-                }
-            },
+            //     if (tags !== undefined && tags !== null && tags !== "") {
+            //         multiInputTags.setTokens([
+            //             new Token({ text: tags, key: tags })
+            //         ]);
+            //     }
+            // },
 
-            onTagsChange: function (oEvent) {
-                var value = oEvent.getParameter("value");
-                var multiInputTags = this.byId("multiInputTags");
-                multiInputTags.setTokens([
-                    new Token({ text: value, key: value })
-                ]);
-            },
+            // onTagsChange: function (oEvent) {
+            //     var value = oEvent.getParameter("value");
+            //     var multiInputTags = this.byId("multiInputTags");
+            //     multiInputTags.setTokens([
+            //         new Token({ text: value, key: value })
+            //     ]);
+            // },
 
-            onIntegrationChange: function (oEvent) {
-                var bValue = oEvent.getParameter("state");
+            // onIntegrationChange: function (oEvent) {
+            //     var bValue = oEvent.getParameter("state");
 
-                if (bValue === true) {
-                    this.getModel("appModel").setProperty("/isIntegrationVisible", true);
-                } else {
-                    this.getModel("appModel").setProperty("/isIntegrationVisible", false);
-                }
-            },
+            //     if (bValue === true) {
+            //         this.getModel("appModel").setProperty("/isIntegrationVisible", true);
+            //     } else {
+            //         this.getModel("appModel").setProperty("/isIntegrationVisible", false);
+            //     }
+            // },
 
-            _fnReadAssociation: function () {
-                var that = this;
-                var oModel = this.getModel();
+            // _fnReadAssociation: function () {
+            //     var that = this;
+            //     var oModel = this.getModel();
 
-                oModel.bindList("/Configuration", undefined, undefined, undefined, {
-                    $select: "targetTable,code,name"
-                }).requestContexts().then(function (aContexts) {
-                    var aResults = aContexts.map(function (oContext) {
-                        return oContext.getObject();
-                    });
-                    that.getModel("appModel").setProperty("/Association", aResults);
-                }).catch(function (oError) {
-                    MessageBox.error(`${oError.message}: ${oError.statusCode} ${oError.statusText}`);
-                });
-            },
+            //     oModel.bindList("/Configuration", undefined, undefined, undefined, {
+            //         $select: "targetTable,code,name"
+            //     }).requestContexts().then(function (aContexts) {
+            //         var aResults = aContexts.map(function (oContext) {
+            //             return oContext.getObject();
+            //         });
+            //         that.getModel("appModel").setProperty("/Association", aResults);
+            //     }).catch(function (oError) {
+            //         MessageBox.error(`${oError.message}: ${oError.statusCode} ${oError.statusText}`);
+            //     });
+            // },
 
-            onVersionHistory: function (oEvent) {
-                var that = this;
-                var oTable = this.byId("tblVersionHistory");
-                var paneSize = oEvent.getSource().data("footer");
-                paneSize = paneSize === "ShowPane" ? "30%" : "0%";
-                this.getModel("appModel").setProperty("/showVersionHistory", paneSize);
-                oTable.getRowMode().setRowCount(5);
-                oTable.getRowMode().setMinRowCount(5);
+            // onVersionHistory: function (oEvent) {
+            //     var that = this;
+            //     var oTable = this.byId("tblVersionHistory");
+            //     var paneSize = oEvent.getSource().data("footer");
+            //     paneSize = paneSize === "ShowPane" ? "30%" : "0%";
+            //     this.getModel("appModel").setProperty("/showVersionHistory", paneSize);
+            //     oTable.getRowMode().setRowCount(5);
+            //     oTable.getRowMode().setMinRowCount(5);
 
-                var oModel = this.getModel();
-                oModel.bindContext(`/getVersionHistory(ENTITY='Attributes',ID=${this.attributeId})`).requestObject().then(function (oData) {
-                    that.getModel("appModel").setProperty("/AttributesHistory", oData.value);
-                }).catch(function (oError) {
-                    MessageBox.error(`${oError.message}: ${oError.statusCode} ${oError.statusText}`);
-                });
-                oTable.bindRows({
-                    path: "appModel>/AttributesHistory",
-                    sorter: [new sap.ui.model.Sorter("ON", true)]
-                });
-            }
+            //     var oModel = this.getModel();
+            //     oModel.bindContext(`/getVersionHistory(ENTITY='Attributes',ID=${this.attributeId})`).requestObject().then(function (oData) {
+            //         that.getModel("appModel").setProperty("/AttributesHistory", oData.value);
+            //     }).catch(function (oError) {
+            //         MessageBox.error(`${oError.message}: ${oError.statusCode} ${oError.statusText}`);
+            //     });
+            //     oTable.bindRows({
+            //         path: "appModel>/AttributesHistory",
+            //         sorter: [new sap.ui.model.Sorter("ON", true)]
+            //     });
+            // }
 
 
         });

@@ -1,3 +1,1 @@
 ID,contract_id,name,description,alias,start_date,end_date,is_visible,templates_ID,status,createdAt,createdBy,modifiedAt,modifiedBy
-1,BoB/PROC/2025/___,Contract Agreement for Supply and Delivery of Goods,Supply and Delivery Agreement under the Procurement Department – Bank of Bhutan governed by the Bid Invitation Document and Terms & Conditions of Contract,SupplyDeliveryAgreement,2025-01-01,2025-12-31,true,101,Draft,2025-12-04,admin,2025-12-04,admin
-2,STCBL/TOYOTA/____/2025,Vehicle Purchase and Order Agreement – Toyota,Purchase Agreement for Vehicle Sales Division – State Trading Corporation of Bhutan Ltd referencing Customer Order Form – I as integral part,VehiclePurchaseOrderAgreement,2025-01-01,2025-12-31,true,102,Draft,2025-12-04,admin,2025-12-04,admin

@@ -20,7 +20,6 @@ module.exports = async function () {
 
     const grpTemplates = await cds.run(prQuery);
     return grpTemplates;
-
   });
 
 }

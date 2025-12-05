@@ -23,7 +23,7 @@
                     <table:Column width="125px" filterProperty="ATTRIBUTE_GROUP_ID" sortProperty="ATTRIBUTE_GROUP_ID" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attribute_Group_ID}" wrapping="true"/>
                         <table:template>
-                            <Text text="{appModel>ATTRIBUTE_GROUP_ID}" wrapping="false" textAlign="Left" width="100%"/>
+                            <Text text="{appModel>ID}" wrapping="false" textAlign="Left" width="100%"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="300px" filterProperty="NAME" sortProperty="NAME" resizable="true" autoResizable="true" headerMenu="menu">

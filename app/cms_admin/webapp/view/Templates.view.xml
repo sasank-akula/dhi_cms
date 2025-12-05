@@ -23,7 +23,7 @@
                     <table:Column id="templateId" filterProperty="template_id" sortProperty="template_id" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Templates_ColumnID}" wrapping="true"/>
                         <table:template>
-                            <Text text="{template_id}" wrapping="false" textAlign="Left" width="100%"/>
+                            <Text text="{ID}" wrapping="false" textAlign="Left" width="100%"/>
                         </table:template>
                     </table:Column>
                     <table:Column id="templateName" filterProperty="name" sortProperty="name" resizable="true" autoResizable="true" headerMenu="menu">

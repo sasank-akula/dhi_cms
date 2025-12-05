@@ -86,6 +86,7 @@ entity Contracts : cuid, managed {
                            on attachments.contracts = $self;
     attribute_values : Composition of many ContractsAttributes
                            on attribute_values.contracts = $self;
+    status: String default 'Draft';
 }
 
 entity Attachments : cuid, managed {
@@ -130,6 +131,7 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
 
         key _AttributeGroupsAttr.attribute.ID as Attribute_ID,
             _Attributes.name                  as Attribute_Name,
+            _Attributes.type                  as AttributeType,
             _AttributeGroupsAttr.sortID       as AttributeOrder,
             _Attributes.is_mandatory          as Is_Required
     }
@@ -138,3 +140,18 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
     order by
         _Templates.sortID,
         _AttributeGroupsAttr.sortID;
+
+        define view AttributeGroupCatalogue as
+        select from Attribute_Groups as _AttributeGroups
+        left join TemplatesAttributeGroups as _templateGroups
+            on _AttributeGroups.attribute_group_id = _templateGroups.attribute_groups.ID
+        {
+            key _AttributeGroups.ID                   as ID,
+            key _AttributeGroups.attribute_group_id   as attribute_group_id,
+                _AttributeGroups.name                 as name,
+                _AttributeGroups.desc                 as desc,
+                _AttributeGroups.alias                as alias,
+                _templateGroups.templates.name        as template_name,
+            key _templateGroups.templates.template_id as template_id
+
+        }

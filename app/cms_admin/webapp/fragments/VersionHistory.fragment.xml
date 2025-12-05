@@ -1,0 +1,59 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:rowmodes="sap.ui.table.rowmodes">
+    <Panel>
+        <table:Table id="tblVersionHistory" width="100%" selectionMode="None" enableCellFilter="true" core:require='{ handler : "com/dhi/cms/cmsadmin/util/VersionHistoryTableHelper" }'>
+            <table:rowMode>
+                <rowmodes:Interactive rowCount="5" minRowCount="5"/>
+            </table:rowMode>
+            <table:extension>
+                <Toolbar design="Transparent" height="3rem">
+                    <Title text="{i18n>Version_History_Title}" titleStyle="H4"/>
+                    <ToolbarSpacer/>
+                    <Button id="exportVersionHistory" press="handler.onExportData" icon="sap-icon://excel-attachment" tooltip="{i18n>Version_History_ExportTooltip}" />
+                    <Button id="closeVersionHistory" app:footer="HidePane" text="{i18n>Version_History_CloseButton}" press="onVersionHistory" icon="sap-icon://decline" type="Neutral" />
+                </Toolbar>
+            </table:extension>
+            <table:columns>
+                <table:Column filterProperty="appModel>CHANGE_TYPE" sortProperty="appModel>CHANGE_TYPE" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_ChangeType}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{appModel>CHANGE_TYPE}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+                <table:Column filterProperty="appModel>ON" sortProperty="appModel>ON" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_On}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{path:'appModel>ON', formatter: '.formatter.formatDateVersionHistory'}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+                <table:Column filterProperty="appModel>BY" sortProperty="appModel>BY" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_By}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{appModel>BY}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+                <table:Column filterProperty="appModel>FIELD" sortProperty="appModel>FIELD" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_Field}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{appModel>FIELD}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+                <table:Column filterProperty="appModel>NEW_VALUE" sortProperty="appModel>NEW_VALUE" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_NewValue}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{appModel>NEW_VALUE}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+                <table:Column filterProperty="appModel>OLD_VALUE" sortProperty="appModel>OLD_VALUE" resizable="true" autoResizable="true" headerMenu="menu">
+                    <Label text="{i18n>Version_History_OldValue}" wrapping="true"/>
+                    <table:template>
+                        <Text text="{appModel>OLD_VALUE}" wrapping="false"/>
+                    </table:template>
+                </table:Column>
+            </table:columns>
+        </table:Table>
+    </Panel>
+</core:FragmentDefinition>

@@ -16,5 +16,9 @@ service ContractService @(path: '/contracts') {
             TemplateID: :TemplateID
         );
 
+    function getGroupAssociatedTemplates() returns array of String
+
+    entity AttributeGroupCatalogue as projection on cms.AttributeGroupCatalogue;
+
 
 }

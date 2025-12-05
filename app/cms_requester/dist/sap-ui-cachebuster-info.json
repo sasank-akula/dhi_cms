@@ -1,0 +1,22 @@
+{
+  "view/Contracts.view.xml": 1764860253191,
+  "controller/Contracts.controller.js": 1764860253195,
+  "model/models.js": 1764860253187,
+  "controller/App.controller.js": 1764860253191,
+  "manifest.json": 1764860261015,
+  "Component.js": 1764860253183,
+  "model/models-dbg.js": 1764860253187,
+  "model/models.js.map": 1764916390971,
+  "controller/Contracts-dbg.controller.js": 1764860253195,
+  "controller/Contracts.controller.js.map": 1764916390972,
+  "controller/App-dbg.controller.js": 1764860253191,
+  "controller/App.controller.js.map": 1764916390957,
+  "Component-dbg.js": 1764860253183,
+  "Component.js.map": 1764916390974,
+  "Component-preload.js": 1764916391052,
+  "Component-preload.js.map": 1764916391052,
+  "i18n/i18n.properties": 1764860261015,
+  "view/App.view.xml": 1764860253191,
+  "css/style.css": 1764860253191,
+  "index.html": 1764860253183
+}

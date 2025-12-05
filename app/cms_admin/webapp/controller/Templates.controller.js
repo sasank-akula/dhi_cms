@@ -6,64 +6,20 @@ sap.ui.define([
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
     'sap/ui/model/FilterType'
-], (BaseController, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType) => {
-    "use strict";
+],
 
-    return BaseController.extend("com.dhi.cms.cmsadmin.controller.Attributes", {
-         onInit: function () {
-                this.getRouter().getRoute("Attributes").attachPatternMatched(this._onObjectMatched, this);
+    function (BaseController, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType) {
+        "use strict";
+
+        return BaseController.extend("com.dhi.cms.cmsadmin.controller.Templates", {
+            onInit: function () {
+                this.getRouter().getRoute("Templates").attachPatternMatched(this._onObjectMatched, this);
             },
+
             _onObjectMatched: function (oEvent) {
                 this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();
-            },
-             onAttributeDelete: function (oEvent) {
-                let oBundle = this.getResourceBundle();
-                var attributeName = oEvent.getSource().getBindingContext().getObject().name;
-                let sConfirmationMessage = oBundle.getText("attributeDeleteConfirmationMessage", [attributeName]);           
-                MessageBox.warning(sConfirmationMessage, {
-                    icon: MessageBox.Icon.WARNING,
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.YES,
-                    initialFocus: MessageBox.Action.NO,
-                    dependentOn: this.getView(),
-                    onClose: (sAction) => {
-                        if (sAction === "YES") {
-                            oEvent.getSource().getBindingContext().delete("$auto").then(function () {
-                                let sSuccessMessage = oBundle.getText("attributeDeleteSuccessMessage", [attributeName]);
-                                MessageToast.show(sSuccessMessage);
-                                this._refreshTable();
-                            }.bind(this), function (oError) {
-                                let sErrorMessage = oBundle.getText("attributeDeleteErrorMessage", [attributeName]);
-                                MessageBox.error(sErrorMessage);
-                            });
-                        }
-                    }
-                });
-            },
-
-            /**
-             * Refresh the Attributes table
-             * @memberof com.pimx.prodsphere.pxm.controller.Attributes
-             * @private
-             */
-            _refreshTable: function () {
-                this.byId("tblAttributes").getBinding("rows").refresh();
-            },
-
-            /**
-             * Handler to trigger navigation for Attribute edit page
-             * @memberof com.pimx.prodsphere.pxm.controller.Attributes
-             * @public
-             * @param {sap.ui.base.Event} event The event object
-             */
-            onAttributeEdit: function (event) {
-                let context = event.getSource().getBindingContext();
-                let { ID } = context.getObject();
-                this.getRouter().navTo("Create Attributes", {
-                    attributeId: ID
-                });
             },
 
             onClearFilters: function () {
@@ -72,19 +28,19 @@ sap.ui.define([
             },
 
             clearAllFilters: function () {
-                var oTable = this.byId("tblAttributes");
+                var oTable = this.byId("tblTemplates");
                 var oFilter = null;
 
                 var aColumns = oTable.getColumns();
                 for (var i = 0; i < aColumns.length; i++) {
                     oTable.filter(aColumns[i], null);
                 }
-                this.byId("tblAttributes").getBinding("rows").filter(oFilter, "Application");
+                this.byId("tblTemplates").getBinding("rows").filter(oFilter, "Application");
             },
 
             onTableFilter: function (oEvent) {
                 var sQuery = oEvent.getParameter("value");
-                var oTable = this.byId("tblAttributes");
+                var oTable = this.byId("tblTemplates");
                 var oBinding = oTable.getBinding("rows");
 
                 if (sQuery) {
@@ -126,7 +82,42 @@ sap.ui.define([
                     oBinding.filter([], sap.ui.model.FilterType.Application);
                 }
             },
-             _setPersonalization: function () {
+
+            onTemplateDelete: function (oEvent) {
+                let oBundle = this.getResourceBundle();
+                let templateName = oEvent.getSource().getBindingContext().getObject().name;
+                MessageBox.warning(oBundle.getText("templateDeleteWarning", [templateName]), {
+                    icon: MessageBox.Icon.WARNING,
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.YES,
+                    initialFocus: MessageBox.Action.NO,
+                    dependentOn: this.getView(),
+                    onClose: (sAction) => {
+                        if (sAction === "YES") {
+                            oEvent.getSource().getBindingContext().delete("$auto").then(function () {
+                                MessageToast.show(oBundle.getText("templateDeleteSuccess", [templateName]));
+                                this._refreshTable();
+                            }.bind(this), function (oError) {
+                                MessageBox.error(oBundle.getText("templateDeleteError", [templateName]));
+                            });
+                        }
+                    }
+                });
+            },
+
+            onTemplateEdit: function (event) {
+                let context = event.getSource().getBindingContext();
+                let { ID } = context.getObject();
+                this.getRouter().navTo("Create Template", {
+                    templateId: ID
+                });
+            },
+
+            _refreshTable: function () {
+                this.byId("tblTemplates").getBinding("rows").refresh();
+            },
+
+            _setPersonalization: function () {
                 var oBundle, oDeferred, oPersoService = {
                     oPersoData: {
                         _persoSchemaVersion: "1.0",
@@ -154,7 +145,7 @@ sap.ui.define([
                     }
                 };
                 this.oTablePersoController = new TablePersoController({
-                    table: this.byId("tblAttributes"),
+                    table: this.byId("tblTemplates"),
                     persoService: oPersoService
                 });
             },
@@ -170,8 +161,9 @@ sap.ui.define([
             },
 
             onRowsUpdated: function () {
-                var oTable = this.byId("tblAttributes");
-                this.getModel("appModel").setProperty("/AttributeCount", oTable.getBinding("rows").getLength());
+                var oTable = this.byId("tblTemplates");
+                this.getModel("appModel").setProperty("/TemplateCount", oTable.getBinding("rows").getLength());
             }
+
+        });
     });
-});

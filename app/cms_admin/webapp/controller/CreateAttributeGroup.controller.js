@@ -29,8 +29,8 @@ sap.ui.define([
                 // this._updateBreadcrumbs(sRouteName);
                 this.attributeGroupId = attributeGroupId;
                 this._fnRegisterMessageManager();
-                var sTitle = isEditMode 
-                    ? this.getResourceBundle().getText("Update_Attribute_Group_Title") 
+                var sTitle = isEditMode
+                    ? this.getResourceBundle().getText("Update_Attribute_Group_Title")
                     : this.getResourceBundle().getText("Create_Attribute_Group_Title");
                 this.getView().byId("attributeGroupTitle").setText(sTitle);
                 debugger
@@ -65,6 +65,47 @@ sap.ui.define([
 
                 return oldAttributes;
             },
+
+
+            // _fnReadAttributes: function () {
+            //     var that = this;
+            //     var oModel = this.getModel();
+
+            //     oModel.bindList("/Attributes").requestContexts().then(function (aContexts) {
+
+            //         // Extract data from contexts
+            //         var newAttributes = aContexts.map(function (ctx) {
+            //             return ctx.getObject();
+            //         });
+
+            //         // Current AssociatedAttributes
+            //         var currentAttributes = that.getModel("appModel").getProperty("/AssociatedAttributes") || [];
+
+            //         // Create a map for current attributes by name
+            //         const currentAttributesMap = new Map(
+            //             currentAttributes.map(attr => [attr.name, attr])
+            //         );
+
+            //         // Assign Rank = 0 for attributes not already present
+            //         newAttributes.forEach(function (attr) {
+            //             if (!currentAttributesMap.has(attr.name)) {
+            //                 attr.Rank = 0;
+            //             }
+            //         });
+
+            //         // Merge attributes and remove duplicates
+            //         var mergedAttributes = that.mergeAttributes(currentAttributes, newAttributes);
+
+            //         console.log("Merged Attributes:", mergedAttributes);
+
+            //         // Set data to appModel
+            //         that.getModel("appModel").setProperty("/AssociatedAttributes", mergedAttributes);
+
+            //     }).catch(function (oError) {
+            //         console.error("Error reading Attributes:", oError);
+            //     });
+            // },
+
 
             _fnReadAttributes: function () {
                 var that = this;
@@ -107,7 +148,7 @@ sap.ui.define([
 
 
             //Validation check
-            onSave: function () {
+            onSave: async function () {
                 var bValid = true;
                 var attributeName = this.byId("attributeGrpNameInput").getValue();
                 var aliasName = this.byId("aliasNameInputAtrGrp").getValue();
@@ -128,13 +169,13 @@ sap.ui.define([
                 //     this.byId("aliasNameInputAtrGrp").setValueState("None");
                 // }
                 if (bValid === true) {
-                    this.handleSaveAttributeGroup();
-                    this.onNavigation('Attribute Groups')
-                    this.byId("attributeGrpNameInput").setValueState("None");
+                    await this.handleSaveAttributeGroup();
+                    await this.byId("attributeGrpNameInput").setValueState("None");
+                    await this.onNavigation('Attribute Groups')
                     // this.byId("aliasNameInputAtrGrp").setValueState("None");
                 }
             },
-            handleSaveAttributeGroup: function () {
+            handleSaveAttributeGroup: async function () {
                 let oBundle = this.getResourceBundle();
                 var that = this;
                 var oModel = this.getModel("appModel").getData().AttributeGroup;
@@ -175,7 +216,7 @@ sap.ui.define([
                         bSkipRefresh: true
                     });
                     this._refreshMessageManager();
-                    this.getModel().submitBatch("$auto").then(function(response) {
+                    this.getModel().submitBatch("$auto").then(function (response) {
                         var aMessages = that.getModel("message").getData();
                         var oErrorMessage = aMessages.slice().reverse().find((message) => message.type === 'Error');
                         if (oErrorMessage) {
@@ -225,7 +266,7 @@ sap.ui.define([
                             });
                         },
                         error: function (oError) {
-                            MessageBox.error(oBundle.getText("attributeGroupReadError")); 
+                            MessageBox.error(oBundle.getText("attributeGroupReadError"));
                         }
                     });
                 }
@@ -570,7 +611,7 @@ sap.ui.define([
             //     this.getModel("appModel").setProperty("/showVersionHistory", paneSize); 
             //     oTable.getRowMode().setRowCount(5); 
             //     oTable.getRowMode().setMinRowCount(5);               
-               
+
             //     var oModel = this.getModel();
             //     oModel.bindContext(`/getVersionHistory(ENTITY='Attribute_Groups',ID=${this.attributeGroupId})`).requestObject().then(function (oData) {
             //         that.getModel("appModel").setProperty("/AttributeGroupsHistory", oData.value);

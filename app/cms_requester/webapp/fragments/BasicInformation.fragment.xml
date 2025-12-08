@@ -26,13 +26,14 @@
                 width="500px" 
             />
 
-            <Label text="Contract Number / Reference ID"/>
+            <Label text="Contract Number / Reference ID" visible="{= !!${contractModel>/ID} }"/>
             <Input 
                 id="contractNumberInput" 
                 placeholder="Enter contract ID" 
                 value="{contractModel>/ID}" 
                 editable="false"
                 width="500px"
+                visible="{= !!${contractModel>/ID} }"
             />
 
             <Label text="Contract Type" required="true"/>
@@ -41,6 +42,7 @@
                 selectedKey="{contractModel>/templates_ID}" 
                 items="{path: '/Templates'}"
                 width="500px"
+                editable="{= !${contractModel>/ID} }"
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>

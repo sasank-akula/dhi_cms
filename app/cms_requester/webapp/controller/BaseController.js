@@ -246,24 +246,7 @@ sap.ui.define([
                 let oDataBinding = oModel.bindList(sPath);
                 let oContext = oDataBinding.create(oNewData);
 
-                oContext.created().then(() => {
-                    try {
-                        let oData = oContext.getObject(); // entity from backend
-                        console.log("New entity created:", oData);
-
-                        if (oData && oData.ID) {
-                            console.log("New ID:", oData);
-                            resolve(oData); // ✅ return ID
-                        } else {
-                            reject("No ID returned from backend");
-                        }
-                    } catch (err) {
-                        reject(err);
-                    }
-                }).catch((err) => {
-                    console.error("Create failed:", err);
-                    reject(err);
-                });
+                return oContext;
             });
         }
 

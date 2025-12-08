@@ -19,7 +19,7 @@
                         </SearchField>
                         <ToolbarSeparator class="sapUiSmallMarginBeginEnd" />
                         <upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
-                        <Button id="downloadSelectedButton" text="{i18n>Assets_Download}" enabled="false" press="onDownloadFiles" />
+                        <Button id="downloadSelectedButton" text="Download" enabled="false" press="onDownloadFiles" />
 
                     </OverflowToolbar>
                 </headerToolbar>

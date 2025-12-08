@@ -67,24 +67,6 @@ sap.ui.define([
                 console.error("Navigation target not defined.");
             }
         },
-        onEditContract: async function (oEvent) {
-            const oSource = oEvent.getSource();
-            const oBindingContext = oSource.getBindingContext();
-            if (!oBindingContext) return;
-            const sID = oBindingContext.getProperty("ID");
-            const oModel = this.getView().getModel();
-
-            const sEntityPath = `/Contracts('${sID}')`;
-            let oContext = oModel.bindContext(sEntityPath, undefined, { $expand: "attribute_values" });
-            let oDetail = await oContext.requestObject().then(function (oData) {
-                console.log(oData);
-                return oData;
-            })
-            console.log("Server contract + attribute_values:", oDetail);
-            this.getView().getModel("contractModel").setData(oDetail);
-
-
-        },
         _onObjectMatched: function (oEvent) {
             this._refreshTable();
             this._setPersonalization();
@@ -184,13 +166,7 @@ sap.ui.define([
         _refreshTable: function () {
             this.byId("tblContracts").getBinding("rows").refresh();
         },
-        onProductEdit: function (event) {
-            let context = event.getSource().getBindingContext();
-            let { ID } = context.getObject();
-            this.getRouter().navTo("Create Products", {
-                productId: ID
-            });
-        },
+       
 
         onClearFilters: function () {
             this.byId("clearFilters").setEnabled(false);
@@ -327,7 +303,15 @@ sap.ui.define([
                     });
                 }
             });
-        }
+        },
+         onEditContract: function (event) {
+            let context = event.getSource().getBindingContext();
+            let { ID } = context.getObject();
+            this.getRouter().navTo("ContractDetails", {
+                contractId: ID
+            });
+            
+        },
 
     });
 });

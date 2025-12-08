@@ -38,7 +38,7 @@
         <f:content>
             <table:Table id="tblContracts" selectionMode="None" rows="{ path: '/Contracts',
             parameters: { operationMode: 'Server', $select: 'ID,alias,contract_id,description,start_date,end_date,templates_ID' },
-            sorter: { path: 'contract_id', descending: true } }" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" rowsUpdated="onRowsUpdated" threshold="15" enableBusyIndicator="true">
+            sorter: { path: 'contract_id', descending: true } }" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" rowsUpdated="onRowsUpdated" enableBusyIndicator="true">
 
                 <table:extension>
                     <OverflowToolbar class="sapUiTinyMarginTop overflowToolbarBorder">
@@ -107,7 +107,12 @@
                         </table:template>
                     </table:Column>
 
-
+                    <table:Column id="col_status" sortProperty="status" filterProperty="status" width="9rem">
+                        <Label text="Status"/>
+                        <table:template>
+                            <Text text="{status}" />
+                        </table:template>
+                    </table:Column>
 
                     <!-- Actions -->
                     <table:Column id="col_actions" width="7rem">

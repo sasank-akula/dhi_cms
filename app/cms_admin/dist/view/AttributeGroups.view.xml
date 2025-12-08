@@ -8,7 +8,7 @@
     xmlns:rowmodes="sap.ui.table.rowmodes" controllerName="com.dhi.cms.cmsadmin.controller.AttributeGroups">
     <Page id="AttributeGroupsPage" showHeader="false">
         <content>
-            <table:Table id="tblAttributeGroups" selectionMode="None" visibleRowCountMode="Auto" rows="{path: 'appModel>/attributeAssociatedTemplates'}" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributeGroupTableHelper" }' rowsUpdated="onRowsUpdated">
+            <table:Table id="tblAttributeGroups" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: 'appModel>/attributeAssociatedTemplates'}" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributeGroupTableHelper" }' rowsUpdated="onRowsUpdated">
                 <table:extension>
                     <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">
                         <Title text="{i18n>Attribute_Group_Title} ({appModel>/AttributeGroupCount})" titleStyle="H3"/>
@@ -23,7 +23,7 @@
                     <table:Column width="125px" filterProperty="ATTRIBUTE_GROUP_ID" sortProperty="ATTRIBUTE_GROUP_ID" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attribute_Group_ID}" wrapping="true"/>
                         <table:template>
-                            <Text text="{appModel>ATTRIBUTE_GROUP_ID}" wrapping="false" textAlign="Right" width="100%"/>
+                            <Text text="{appModel>ID}" wrapping="false" textAlign="Left" width="100%"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="300px" filterProperty="NAME" sortProperty="NAME" resizable="true" autoResizable="true" headerMenu="menu">

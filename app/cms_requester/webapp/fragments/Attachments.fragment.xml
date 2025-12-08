@@ -1,0 +1,84 @@
+<core:FragmentDefinition xmlns:plugins="sap.m.plugins"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:f="sap.f"
+    xmlns:grid="sap.ui.layout.cssgrid"
+    xmlns:upload="sap.m.upload">
+    <f:GridList class="sapUiMediumMarginTop sapUiMediumMarginBegin" width="96%">
+        <f:GridListItem>
+            <Table id ="UploadSetTable" sticky ="ColumnHeaders,HeaderToolbar" width ="auto" mode ="MultiSelect" fixedLayout ="false" inset ="true" autoPopinMode ="true" hiddenInPopin ="None" items ="{ path : 'contractModel>/attachments'}" selectionChange ="onSelectionChange">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="Uploaded ({= ${/Attachments/$count}})" level="H2" />
+                        <ToolbarSpacer />
+                        <SearchField width="20%" liveChange=".onSearchDocuments">
+                            <layoutData>
+                                <OverflowToolbarLayoutData priority="NeverOverflow" />
+                            </layoutData>
+                        </SearchField>
+                        <ToolbarSeparator class="sapUiSmallMarginBeginEnd" />
+                        <upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
+                        <Button id="downloadSelectedButton" text="{i18n>Assets_Download}" enabled="false" press="onDownloadFiles" />
+
+                    </OverflowToolbar>
+                </headerToolbar>
+                <dependents>
+                    <plugins:UploadSetwithTable multiple="true" beforeInitiatingItemUpload="onBeforeInitiatingItemUpload" beforeUploadStarts="onBeforeUploadStarts" itemRenamed="onDocumentRenamedSuccess" uploadCompleted="onUploadCompleted" onActivated="onPluginActivated" cloudFilePickerEnabled="true" actions="uploadButton" fileTypes= "{appModel>/validAssetTypes}">
+                        <plugins:rowConfiguration>
+                            <upload:UploadItemConfiguration fileNamePath="file_name" mediaTypePath="media_type" urlPath="file_url" previewablePath="previewable" isTrustedSourcePath="trustedSource"></upload:UploadItemConfiguration>
+                        </plugins:rowConfiguration>
+                    </plugins:UploadSetwithTable>
+                </dependents>
+                <!-- <dependents>
+                    <plugins.UploadSetwithTable multiple="true" beforeInitiatingItemUpload="onBeforeInitiatingItemUpload" uploadUrl="/uploadFiles" beforeUploadStarts="onBeforeUploadStarts" itemRenamed="onDocumentRenamedSuccess" uploadCompleted="onUploadCompleted" itemValidationHandler=".itemValidationCallback">
+                        <rowConfiguration>
+                            <upload.UploadItemConfiguration fileNamePath="{file_name}" mediaTypePath="{file_type}" urlPath="/odata/v4/admin/Assets({ID})/file_content"/>
+                        </rowConfiguration>
+                    </plugins.UploadSetwithTable>
+                </dependents> -->
+                <columns>
+                    <Column id="fileName" importance="High">
+                        <header>
+                            <Label text="File Name" />
+                        </header>
+                    </Column>
+                    <Column id="FileSize">
+                        <header>
+                            <Label text="File Size" />
+                        </header>
+                    </Column>
+                    <Column id="fileType">
+                        <header>
+                            <Label text="File Type" />
+                        </header>
+                    </Column>
+                    <Column id="uploadedOn">
+                        <header>
+                            <Label text="Uploaded On" />
+                        </header>
+                    </Column>
+                    <Column id="Action">
+                        <header>
+                            <Label text="Action" />
+                        </header>
+                    </Column>
+
+                </columns>
+                <items>
+
+                    <ColumnListItem>
+                        <cells>
+                            <Link text="{contractModel>fileName}" press="openPreview" class="sapUiTinyMarginBottom"/>
+                            <Text text="{contractModel>fileSize}" />
+                            <Text text="{contractModel>mediaType}" />
+                            <Text text="{contractModel>uploadedOn}" />
+                            <Button class="sapUiTinyMarginBegin" type="Transparent" icon="sap-icon://decline" press="onRemoveFiles" />
+                        </cells>
+                    </ColumnListItem>
+                    <!-- </plugins:UploadSetwithTable> -->
+                </items>
+            </Table>
+        </f:GridListItem>
+    </f:GridList>
+</core:FragmentDefinition>

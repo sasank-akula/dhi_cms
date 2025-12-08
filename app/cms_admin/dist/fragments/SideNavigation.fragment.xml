@@ -3,8 +3,8 @@
     xmlns:tnt="sap.tnt">
     <tnt:SideNavigation id="sideNavigation">
         <tnt:NavigationList>
-            <tnt:NavigationListItem text="{i18n>Side_Navigation_Attributes}" icon="sap-icon://group-2" select="onNavigation('Attributes')" />
-            <tnt:NavigationListItem text="{i18n>Side_Navigation_Attribute_Groups}" icon="sap-icon://tag" select="onNavigation('Attribute Groups')" />
+            <tnt:NavigationListItem text="{i18n>Side_Navigation_Attributes}" icon="sap-icon://add-activity" select="onNavigation('Attributes')" />
+            <tnt:NavigationListItem text="{i18n>Side_Navigation_Attribute_Groups}" icon="sap-icon://group-2" select="onNavigation('Attribute Groups')" />
             <tnt:NavigationListItem text="{i18n>Side_Navigation_Templates}" icon="sap-icon://business-card" select="onNavigation('Templates')" />
         </tnt:NavigationList>
     </tnt:SideNavigation>

@@ -21,6 +21,15 @@
 			"toolsId": "ef83bb8b-00ee-492f-a172-087653ae627f"
 		},
 		"dataSources": {
+			"adminV2": {
+				"uri": "/odata/v2/contracts/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"localUri": "localService/admin/metadata.xml",
+					"odataVersion": "2.0"
+				}
+			},
 			"mainService": {
 				"uri": "/contracts/",
 				"type": "OData",
@@ -86,6 +95,20 @@
 			"appModel": {
 				"type": "sap.ui.model.json.JSONModel"
 			},
+			"attributeTypes": {
+				"uri": "model/data/attributeTypes.json",
+				"type": "sap.ui.model.json.JSONModel"
+			},
+			"oDataV2": {
+				"dataSource": "adminV2",
+				"preload": true,
+				"settings": {
+					"synchronizationMode": "None",
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
 			"": {
 				"dataSource": "mainService",
 				"preload": true,
@@ -129,6 +152,34 @@
 					"target": [
 						"AttributeGroups"
 					]
+				},
+				{
+					"name": "Create Attribute Group",
+					"pattern": "createattributegroup/:attributeGroupId:",
+					"target": [
+						"CreateAttributeGroup"
+					]
+				},
+				{
+					"name": "Templates",
+					"pattern": "templates/:templateId:",
+					"target": [
+						"Templates"
+					]
+				},
+				{
+					"name": "Create Attributes",
+					"pattern": "createattributes/:attributeId:",
+					"target": [
+						"CreateAttributes"
+					]
+				},
+				{
+					"name": "Create Template",
+					"pattern": "createtemplate/:templateId:",
+					"target": [
+						"CreateTemplate"
+					]
 				}
 			],
 			"targets": {
@@ -142,6 +193,34 @@
 					"clearControlAggregation": false,
 					"viewId": "attributegroups",
 					"viewName": "AttributeGroups"
+				},
+				"Templates": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "templates",
+					"viewName": "Templates"
+				},
+				"CreateAttributes": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "createattributes",
+					"viewName": "CreateAttributes"
+				},
+				"CreateAttributeGroup": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "createattributegroup",
+					"viewName": "CreateAttributeGroup"
+				},
+				"CreateTemplate": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "createtemplate",
+					"viewName": "CreateTemplate"
 				}
 			}
 		},

@@ -1,0 +1,67 @@
+<core:FragmentDefinition xmlns:f="sap.ui.layout.form" xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:grid="sap.ui.layout.cssgrid">
+    
+          <f:SimpleForm
+      id="contractSimpleForm"
+            editable="true"
+            title="Contract Information"
+            width="98%"
+            maxContainerCols="1"
+            layout="ResponsiveGridLayout"
+            labelSpanL="4" labelSpanM="4" labelSpanS="12"
+            adjustLabelSpan="true"
+            columnsL="1"
+            columnsM="1"
+            columnsXL="1"
+            class="contractForm"
+       
+    >
+        <f:content>
+            <Label text="Contract Title" required="true"/>
+            <Input 
+                id="contractTitleInput" 
+                placeholder="Enter contract title" 
+                value="{contractModel>/name}"
+                width="500px" 
+            />
+
+            <Label text="Contract Number / Reference ID"/>
+            <Input 
+                id="contractNumberInput" 
+                placeholder="Enter contract ID" 
+                value="{contractModel>/ContractNumber}" 
+                editable="false"
+                width="500px"
+            />
+
+            <Label text="Contract Type" required="true"/>
+            <ComboBox 
+                id="contractTypeSelect" 
+                selectedKey="{contractModel>/templates_ID}" 
+                items="{path: '/Templates'}"
+                width="500px"
+            >
+                <core:Item key="{ID}" text="{name}" />
+            </ComboBox>
+
+            <Label text="Related Master Agreement"/>
+            <Input 
+                id="masterAgreementInput" 
+                placeholder="Enter reference ID" 
+                value="{contractModel>/MasterAgreementID}"
+                width="500px"
+            />
+
+            <Label text="Project / Business Unit"/>
+            <ComboBox 
+                id="businessUnitSelect" 
+                selectedKey="{contractModel>/BusinessUnitID}" 
+                items="{path: 'contractModel>/ValidBusinessUnits'}"
+                width="500px"
+            >
+                <core:Item key="{contractModel>ID}" text="{contractModel>Name}" />
+            </ComboBox>
+        </f:content>
+    </f:SimpleForm>
+</core:FragmentDefinition>

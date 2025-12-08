@@ -16,8 +16,6 @@ sap.ui.define([
             },
 
             _onObjectMatched: function (oEvent) {
-                var sRouteName = oEvent.getParameter("name");
-                this._updateBreadcrumbs(sRouteName);
                 this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();
@@ -48,7 +46,6 @@ sap.ui.define([
                         NAME: item.getProperty("NAME"),
                         DESC: item.getProperty("DESC"),
                         ALIAS: item.getProperty("ALIAS"),
-                        ROLE: item.getProperty("ROLE"),
                         TEMPLATE_NAME: item.getProperty("TEMPLATE_NAME")
                     }));
                     appModel.setProperty("/attributeAssociatedTemplates", attributes);

@@ -1,0 +1,96 @@
+<core:FragmentDefinition   xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  xmlns:f="sap.ui.layout.form"
+  xmlns:layout="sap.ui.layout">
+    
+  <ScrollContainer height="80vh" width="100%" vertical="true" horizontal="false">
+        <VBox class="previewDialogVBox" width="100%" renderType="Bare">
+
+          <!-- Basic Information Panel -->
+          <Panel headerText="Basic Information" expandable="false" class="previewPanel">
+            <f:SimpleForm
+              layout="ResponsiveGridLayout"
+              editable="false"
+              class="previewForm"
+              labelSpanL="4" labelSpanM="4" labelSpanS="12"
+              adjustLabelSpan="true"
+              maxContainerCols="1"
+              columnsXL="1" columnsL="1" columnsM="1">
+
+              <Label text="Contract Title"/>
+              <Text text="{contractModel>/name}" />
+
+              <Label text="Contract Number / Reference ID"/>
+              <Text text="{contractModel>/contract_id}" />
+
+              <Label text="Start Date"/>
+              <Text text="{parts: [{path: 'contractModel>/start_date'}], formatter: '.formatDate'}" />
+
+              <Label text="End Date"/>
+              <Text text="{parts: [{path: 'contractModel>/end_date'}], formatter: '.formatDate'}" />
+
+              <Label text="Status"/>
+              <Text text="{contractModel>/status}" />
+
+              <Label text="Contract Type (Template ID)"/>
+              <Text text="{contractModel>/templates_ID}" />
+
+            </f:SimpleForm>
+          </Panel>
+
+          <!-- Attribute Groups -->
+          <List
+            items="{Details>/AttributeGroups}"
+            showSeparators="None"
+            width="100%"
+            class="attributeGroupList"
+            noDataText="No attribute groups found">
+
+            <items>
+              <CustomListItem type="Inactive">
+                <Panel headerText="{Details>Attribute_Group_Name}" expandable="false" width="100%" class="attributeGroupPanel">
+                  <VBox width="100%">
+
+                    <!-- Render group's attributes as a single-column form -->
+                    <f:SimpleForm
+                      layout="ResponsiveGridLayout"
+                      editable="false"
+                      width="100%"
+                      class="attributeGroupForm"
+                      labelSpanL="4" labelSpanM="4" labelSpanS="12"
+                      adjustLabelSpan="true"
+                      maxContainerCols="1"
+                      columnsXL="1" columnsL="1" columnsM="1">
+
+                      <!-- iterate attributes using a nested List bound to Attributes -->
+                      <List items="{Details>Attributes}" width="100%" showSeparators="None">
+                        <items>
+                          <CustomListItem type="Inactive">
+                            <HBox fitContainer="true" width="100%" justifyContent="SpaceAround">
+                              <VBox width="45%" alignItems="End">
+                                <Label text="{Details>Attribute_Name}" showColon="true" wrapping="false" class="attributeLabel"/>
+                              </VBox>
+
+                              <VBox width="55%" justifyContent="Start">
+                                <!-- Use formatter to produce a friendly display depending on AttributeType -->
+                                <Text
+                                  text="{parts: [{ path: 'Details>Value' }, { path: 'Details>AttributeType' }], formatter: '.formatAttribute'}"
+                                  wrapping="true"
+                                  class="attributeValue"/>
+                              </VBox>
+                            </HBox>
+                          </CustomListItem>
+                        </items>
+                      </List>
+
+                    </f:SimpleForm>
+
+                  </VBox>
+                </Panel>
+              </CustomListItem>
+            </items>
+          </List>
+
+        </VBox>
+      </ScrollContainer>
+</core:FragmentDefinition>

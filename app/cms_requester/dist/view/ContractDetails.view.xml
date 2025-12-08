@@ -1,0 +1,53 @@
+<mvc:View controllerName="com.dhi.cms.cmsrequester.controller.ContractDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:l="sap.ui.layout">
+   
+                <Page id="createProductsPage" showHeader="false">
+                    <content>
+
+                        <IconTabBar id="iconTabBar" class="noBottomLine" expandable="false" backgroundDesign="Transparent" headerMode="Inline" selectedKey="BasicInfo" select="onTabSelect">
+                            <items>
+                                <IconTabFilter key="BasicInfo" text="Basic_Information">
+                                    <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
+                                        <ToolbarSpacer/>
+                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press=".handleSaveContractBasicInfo"/>
+                                        <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')" visible="{appModel>/isButtonVisible}"/>
+
+                                    </OverflowToolbar>
+                                    <core:Fragment class="sapUiSmallMargin" fragmentName="com.dhi.cms.cmsrequester.fragments.BasicInformation" type="XML" />
+                                </IconTabFilter>
+                                <IconTabFilter key="Details" text="Details">
+                                    <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
+                                        <ToolbarSpacer/>
+                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" />
+                                        <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
+                                    </OverflowToolbar>
+                                    <core:Fragment class="sapUiSmallMarginEnd" fragmentName="com.dhi.cms.cmsrequester.fragments.Details" type="XML" />
+                                </IconTabFilter>
+
+                                <IconTabFilter key="Attachments" text="Attachments">
+                                    <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
+                                        <ToolbarSpacer/>
+                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" />
+                                        <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
+                                    </OverflowToolbar>
+                                    <core:Fragment fragmentName="com.dhi.cms.cmsrequester.fragments.Attachments" type="XML" />
+                                </IconTabFilter>
+                                <IconTabFilter key="ProdPrev" text="Contract Preview" visible="{= ${appModel>/isProductPreviewVisible} &amp;&amp; (${appModel>/userRole} === 'admin' || ${appModel>/userRole} === 'catManager')}">
+                                    <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
+                                        <ToolbarSpacer/>
+                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSubmitContract" />
+                                        <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
+
+                                    </OverflowToolbar>
+                                    <core:Fragment fragmentName="com.dhi.cms.cmsrequester.fragments.Preview" type="XML" />
+                                </IconTabFilter>
+                            </items>
+                        </IconTabBar>
+                    </content>
+                </Page>
+            
+</mvc:View>

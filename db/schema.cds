@@ -25,13 +25,13 @@ entity Attributes : cuid, managed {
     maxlength    : Integer;
     minlength    : Integer;
     is_mandatory : Boolean;
+    
 }
 
 entity AttributeGroupAttribute : cuid, managed {
     attributeGroup  : Association to Attribute_Groups;
     attribute       : Association to Attributes;
     sortID          : Integer;
-   
 }
   @assert.unique: {uniqueAttributeGroupName: [name]}
 entity Attribute_Groups : cuid, managed {

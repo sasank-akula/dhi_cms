@@ -115,8 +115,8 @@
                         <table:template>
                             <HBox>
                                 <Button icon="sap-icon://show" type="Emphasized" press=".onViewContract" tooltip="View"/>
-                                <Button icon="sap-icon://edit" type="Emphasized" press=".onEditContract" tooltip="Edit"/>
-                                <Button icon="sap-icon://delete" type="Emphasized" press=".onDeleteContract" tooltip="Edit"/>
+                                <Button icon="sap-icon://edit" type="Success" press=".onEditContract" tooltip="Edit"/>
+                                <Button icon="sap-icon://delete" type="Reject" press=".onDeleteContract" tooltip="Edit"/>
 
                             </HBox>
                         </table:template>

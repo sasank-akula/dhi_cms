@@ -1,10 +1,11 @@
 sap.ui.define([
+     "./BaseController",
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox"
-], (Controller, MessageBox) => {
+], (BaseController,Controller, MessageBox) => {
     "use strict";
 
-    return Controller.extend("com.dhi.cms.cmsrequester.controller.ContractDetails", {
+    return BaseController.extend("com.dhi.cms.cmsrequester.controller.ContractDetails", {
         onInit() {
             this.getRouter().getRoute("ContractDetails").attachPatternMatched(this._onObjectMatched, this);
 
@@ -15,6 +16,9 @@ sap.ui.define([
             this.contractId = oArgs.contractId;
             const sRouteName = oEvent.getParameter("name");
             const isEditMode = !!this.contractId;
+            if (!this.contractId) {
+                this._initializeContractMasters();
+            }
 
             // this._initializeViewState(oEvent, isEditMode, sRouteName);
 
@@ -24,14 +28,31 @@ sap.ui.define([
         getRouter: function () {
             return this.getOwnerComponent().getRouter();
         },
+        _initializeContractMasters: function () {
+            const data = {
+                "ID": null,
+                "alias": null,
+                "contract_id": null,
+                "description": null,
+                "end_date": null,
+                "is_visible": true,
+                "name": null,
+                "start_date": null,
+                "templates_ID": null,
+                "attribute_values": [],
+                "attachments": []
+            };
+            
+            this.getModel("contractModel").setData(data);
+        },
         _initializeViewState: function (oEvent, isEditMode, sRouteName) {
-                this.getModel("appModel").setProperty("/isEditMode", isEditMode);
-                // this.oItemsProcessor = [];
-                // this.documentTypes = this.getFileCategories();
-                // this._updateBreadcrumbs(sRouteName);
-                // this._fnRegisterMessageManager();
-                this._handleProductData(oEvent);
-            },
+            this.getModel("appModel").setProperty("/isEditMode", isEditMode);
+            // this.oItemsProcessor = [];
+            // this.documentTypes = this.getFileCategories();
+            // this._updateBreadcrumbs(sRouteName);
+            // this._fnRegisterMessageManager();
+            this._handleProductData(oEvent);
+        },
         _focusOnBasicInfoTab: function () {
             const oIconTabBar = this.byId("iconTabBar");
             oIconTabBar.setSelectedKey("BasicInfo");
@@ -226,6 +247,15 @@ sap.ui.define([
             console.log("Mapped upload results:", Attachments);
             this.getOwnerComponent().getModel("contractModel").setProperty("/attachments", Attachments)
             // inspect in browser dev tools
+        },
+        handleSaveContractBasicInfo:async function(){
+            const contractMasterData=this.getModel("contractModel").getData();
+            contractMasterData.attachments=[];
+            contractMasterData.attribute_values=[];
+            contractMasterData.status="Draft";
+            let oResponse=await this.ODataPost("/Contracts",contractMasterData)
+            this.getModel("contractModel").setData(oResponse);
+            
         }
 
     });

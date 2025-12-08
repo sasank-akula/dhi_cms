@@ -30,7 +30,7 @@
             <Input 
                 id="contractNumberInput" 
                 placeholder="Enter contract ID" 
-                value="{contractModel>/ContractNumber}" 
+                value="{contractModel>/ID}" 
                 editable="false"
                 width="500px"
             />
@@ -44,7 +44,13 @@
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
-
+            <Label text="Alias" required="true"/>
+            <Input 
+                id="contractaliasInput" 
+                placeholder="Enter contract title" 
+                value="{contractModel>/alias}"
+                width="500px" 
+            />
             <Label text="Related Master Agreement"/>
             <Input 
                 id="masterAgreementInput" 

@@ -1,5 +1,4 @@
 {
-      "ID": null,
       "alias": null,
       "contract_id": null,
       "description":null,
@@ -9,5 +8,6 @@
       "start_date": null,
       "templates_ID":null,
       "attribute_values": [],
-      "attachments":[]
+      "attachments":[],
+      "status":"new"
 }

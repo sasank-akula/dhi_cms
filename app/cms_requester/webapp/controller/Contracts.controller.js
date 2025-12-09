@@ -1,5 +1,6 @@
 
 sap.ui.define([
+    "./BaseController",
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
@@ -9,11 +10,11 @@ sap.ui.define([
     'sap/ui/model/FilterType',
     "sap/ui/core/Fragment",
     'sap/ui/export/Spreadsheet',
-        'sap/ui/export/library'
-], (Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet,exportLibrary) => {
+    'sap/ui/export/library'
+], (BaseController, Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet, exportLibrary) => {
     "use strict";
     var EdmType = exportLibrary.EdmType;
-    return Controller.extend("com.dhi.cms.cmsrequester.controller.Contracts", {
+    return BaseController.extend("com.dhi.cms.cmsrequester.controller.Contracts", {
         onInit() {
             this.getRouter().getRoute("Contracts").attachPatternMatched(this._onObjectMatched, this);
 
@@ -65,24 +66,6 @@ sap.ui.define([
             } else {
                 console.error("Navigation target not defined.");
             }
-        },
-        onEditContract: async function (oEvent) {
-            const oSource = oEvent.getSource();
-            const oBindingContext = oSource.getBindingContext();
-            if (!oBindingContext) return;
-            const sID = oBindingContext.getProperty("ID");
-            const oModel = this.getView().getModel();
-
-            const sEntityPath = `/Contracts('${sID}')`;
-            let oContext = oModel.bindContext(sEntityPath, undefined, { $expand: "attribute_values" });
-            let oDetail = await oContext.requestObject().then(function (oData) {
-                console.log(oData);
-                return oData;
-            })
-            console.log("Server contract + attribute_values:", oDetail);
-            this.getView().getModel("contractModel").setData(oDetail);
-
-
         },
         _onObjectMatched: function (oEvent) {
             this._refreshTable();
@@ -183,13 +166,7 @@ sap.ui.define([
         _refreshTable: function () {
             this.byId("tblContracts").getBinding("rows").refresh();
         },
-        onProductEdit: function (event) {
-            let context = event.getSource().getBindingContext();
-            let { ID } = context.getObject();
-            this.getRouter().navTo("Create Products", {
-                productId: ID
-            });
-        },
+       
 
         onClearFilters: function () {
             this.byId("clearFilters").setEnabled(false);
@@ -295,8 +272,46 @@ sap.ui.define([
         onRowsUpdated: function () {
             var oTable = this.byId("tblContracts");
             this.getModel("appModel").setProperty("/ProductCount", oTable.getBinding("rows").getLength());
-        }
-
+        },
+        onDeleteContract: function (oEvent) {
+            const oView = this.getView();
+            const oButton = oEvent.getSource();
+            const oContext = oButton.getBindingContext(); 
+            if (!oContext) {
+                sap.m.MessageToast.show("No contract selected for delete.");
+                return;
+            }
+            const sAlias = oContext.getProperty("alias") || oContext.getProperty("contract_id") || "this contract";
+            const sConfirmText = `Are you sure you want to delete ${sAlias}?`;
+            MessageBox.confirm(sConfirmText, {
+                title: "Confirm delete",
+                onClose: (sAction) => {
+                    if (sAction !== sap.m.MessageBox.Action.OK) {
+                        return;
+                    }
+                    oView.setBusy(true);
+                    oContext.delete().then(() => {
+                        oView.setBusy(false);
+                        MessageToast.show("Contract deleted");
+                        const oModel = oView.getModel();
+                        try { oModel.refresh(true); } catch (e) {}
+                    }).catch((oError) => {
+                        oView.setBusy(false);
+                        const sMsg = (oError && oError.message) ? oError.message : "Delete failed";
+                        MessageBox.error("Failed to delete contract: " + sMsg);
+                        try { oView.getModel().refresh(true); } catch (e) { }
+                    });
+                }
+            });
+        },
+         onEditContract: function (event) {
+            let context = event.getSource().getBindingContext();
+            let { ID } = context.getObject();
+            this.getRouter().navTo("ContractDetails", {
+                contractId: ID
+            });
+            
+        },
 
     });
 });

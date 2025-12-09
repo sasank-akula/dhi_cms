@@ -1,10 +1,13 @@
 sap.ui.define([
+    "./BaseController",
     "sap/ui/core/mvc/Controller",
-    "sap/m/MessageBox"
-], (Controller, MessageBox) => {
+    "sap/m/MessageBox",
+    "com/dhi/cms/cmsrequester/util/transaction/ContractHandler",
+    "com/dhi/cms/cmsrequester/util/transaction/ContractManager"
+], (BaseController, Controller, MessageBox, ContractHandler, ContractManager) => {
     "use strict";
 
-    return Controller.extend("com.dhi.cms.cmsrequester.controller.ContractDetails", {
+    return BaseController.extend("com.dhi.cms.cmsrequester.controller.ContractDetails", {
         onInit() {
             this.getRouter().getRoute("ContractDetails").attachPatternMatched(this._onObjectMatched, this);
 
@@ -15,6 +18,13 @@ sap.ui.define([
             this.contractId = oArgs.contractId;
             const sRouteName = oEvent.getParameter("name");
             const isEditMode = !!this.contractId;
+            this._oIconTabBar = this.byId("iconTabBar");
+            if (!this.contractId) {
+                this._initializeContractMasters();
+            }
+            else {
+                this._getContractDetails();
+            }
 
             // this._initializeViewState(oEvent, isEditMode, sRouteName);
 
@@ -24,51 +34,121 @@ sap.ui.define([
         getRouter: function () {
             return this.getOwnerComponent().getRouter();
         },
+        _initializeContractMasters: function () {
+            const data = {
+                "ID": null,
+                "alias": null,
+                "contract_id": null,
+                "description": null,
+                "end_date": null,
+                "is_visible": true,
+                "name": null,
+                "start_date": null,
+                "templates_ID": null,
+                "attribute_values": [],
+                "attachments": []
+            };
+
+            this.getModel("contractModel").setData(data);
+        },
+        _getContractDetails: async function () {
+            let oModel = this.getModel();
+            let sPath = "/Contracts('" + this.contractId + "')";
+            let oContext = oModel.bindContext(sPath, undefined, { $expand: "attribute_values,attachments" });
+            let oDetail = await oContext.requestObject().then(function (oData) {
+                console.log(oData);
+                return oData;
+            })
+            this.contractData = oDetail;
+            this.getModel("contractModel").setData(oDetail);
+        },
         _initializeViewState: function (oEvent, isEditMode, sRouteName) {
-                this.getModel("appModel").setProperty("/isEditMode", isEditMode);
-                // this.oItemsProcessor = [];
-                // this.documentTypes = this.getFileCategories();
-                // this._updateBreadcrumbs(sRouteName);
-                // this._fnRegisterMessageManager();
-                this._handleProductData(oEvent);
-            },
+            this.getModel("appModel").setProperty("/isEditMode", isEditMode);
+            // this.oItemsProcessor = [];
+            // this.documentTypes = this.getFileCategories();
+            // this._updateBreadcrumbs(sRouteName);
+            // this._fnRegisterMessageManager();
+            this._handleProductData(oEvent);
+        },
+        _handleProductData: function (oEvent) {
+            let model = this.getView().getModel();
+            let ContractHandler = ContractManager.getInstance();
+            !ContractHandler?.isBound && ContractHandler.initializeBinding(model, this);
+            ContractHandler?.resetAttributeFetchState();
+            ContractHandler.controller = this;
+
+            if (!this.productId) {
+                this.prepareTabNavigation(oEvent);
+                let context = ContractHandler?.createNewProduct();
+                this.getView().setBindingContext(context);
+                this.getModel("appModel").setProperty("/prodLangEnabled", false);
+                this.isProductEditable("Draft");
+                this.getModel("translation").setData({});
+            } else {
+                this.prepareTabNavigation(oEvent);
+                ContractHandler?.getExistingProduct(this.productId).then((context) => {
+                    this.getView().setBindingContext(context);
+                    if (!this.getView().getBindingContext()) {
+                        const oModel = context.getModel(); // Get the model from the context
+                        this.getView().setModel(oModel);
+                        setTimeout(() => {
+                            this.getView().setBindingContext(context); // Set new binding context after clearing
+                        }, 0);
+                    }
+                    let status = formatter.getStatusDescription(context.getObject().status_ID);
+                    this.productColumnID = context.getObject().product_id;
+                    this.getModel("appModel").setProperty("/prodLangEnabled", true);
+                    this.isProductEditable(status);
+                    this.getSelectedLanguages();
+                    this.getSelectedChannels();
+                    this.getModel("translation").setProperty("/translationName", context.getObject().name);
+                    this.getModel("translation").setProperty("/translationAlias", context.getObject().alias);
+                    this.getModel("translation").setProperty("/translationDescription", context.getObject().description);
+
+                    if (this.getModel().hasPendingChanges()) {
+                        this.getModel().resetChanges();
+                        this.resetCatChanges(context.getObject());
+                    }
+                });
+            }
+        },
         _focusOnBasicInfoTab: function () {
             const oIconTabBar = this.byId("iconTabBar");
             oIconTabBar.setSelectedKey("BasicInfo");
-
-            // oIconTabBar.getItems().forEach((oTab) => {
-            //     const oTabDomRef = oTab.getDomRef();
-            //     if (oTabDomRef) {
-            //         $(oTabDomRef).removeClass("sapMITBSelected sapMITBFocused");
-            //     }
-            // });
-
             const oBasicInfoTab = oIconTabBar.getItems()[0].getDomRef();
             if (oBasicInfoTab) {
                 oBasicInfoTab.focus();
             }
+            this._currentTabKey = "BasicInfo";
+
         },
-        onTabSelect: function (oEvent) {
-            let sSelectedKey = oEvent.getParameters().selectedKey;
+
+        onTabSelect: function (navItemId) {
+            let sSelectedKey = this.byId("iconTabBar").getSelectedKey();
+            if (navItemId) {
+                sSelectedKey = navItemId;
+            }
             let sSelectedContractType = this.byId("contractTypeSelect").getSelectedKey();
             if (!this.byId("contractTypeSelect").getSelectedKey()) {
 
-                oEvent.getSource().setSelectedKey("BasicInfo")
+                this.byId("iconTabBar").setSelectedKey("BasicInfo")
                 MessageBox.warning("Please select the Contract Type")
-                return;
+                return false;
             }
             if (sSelectedKey != "BasicInfo") {
                 if (this._SelectedContractType
                     != sSelectedContractType) {
                     this.initializeDetails();
                 }
-                // else {
-                //     oEvent.getSource().setSelectedKey("BasicInfo")
-                //     MessageBox.warning("Please select the Contract Type")
-                // }
             }
             this._SelectedContractType = sSelectedContractType;
+            return true;
+        },
+        handleNextTabpress: function (navItemId) {
+            if (this.onTabSelect(navItemId)) {
+                this._oIconTabBar.setSelectedKey(navItemId);
 
+            }
         },
         initializeDetails: function () {
             const oODataModel = this.getOwnerComponent().getModel(); // your OData V4 model (must be set in Component)
@@ -96,8 +176,6 @@ sap.ui.define([
                 const rows = aContexts.map(function (ctx) {
                     return ctx.getObject(); // plain JS object per row from the CDS view
                 });
-
-                // 4) Transform flat rows -> grouped model { AttributeGroups: [ { Attributes: [...] } ] }
                 const groupsMap = {};
                 rows.forEach(function (row) {
                     const gid = row.Attribute_Groups_ID || "defaultGroup";
@@ -111,16 +189,32 @@ sap.ui.define([
                         };
                     }
 
+                    // Determine the value based on whether contractId exists
+                    let attributeValue = row.Value || "";
+
+                    if (that.contractId) {
+                        if (that.contractData && that.contractData.attribute_values) {
+                            // Find matching attribute_value by both attribute_groups_ID and attributes_ID
+                            const matchingAttrValue = that.contractData.attribute_values.find(av =>
+                                av.attribute_groups_ID === row.Attribute_Groups_ID &&
+                                av.attributes_ID === row.Attribute_ID
+                            );
+
+                            if (matchingAttrValue) {
+                                attributeValue = matchingAttrValue.valueJson || "";
+                            }
+                        }
+                    }
+
                     // normalize attribute row to a shape your factory expects
                     const attr = {
                         Attribute_ID: row.Attribute_ID,
-                        Attribute_Name: row.Attribute_Name,
+                        Attribute_Name: row.Attribute_Name ,
                         AttributeOrder: row.AttributeOrder || 0,
                         IsMandatory: !!row.Is_Required,
-                        AttributeType: row.AttributeType || "String",           // if your CDS supplies type, use it
-                        AttributeValue: row.AttributeValue || "",               // CSV or array for combobox options
-                        AttributeTypeAssociation: row.AttributeTypeAssociation || [], // associations if any
-                        Value: row.Value || "",                                 // currently stored value (if present)
+                        AttributeType: row.AttributeType || "String",
+                        AttributeTypeAssociation: row.AttributeTypeAssociat || [],
+                        Value: attributeValue,
                         IsPortalEnabled: typeof row.IsPortalEnabled !== "undefined" ? row.IsPortalEnabled : null,
                         Portal_ID: row.Portal_ID || null
                     };
@@ -226,6 +320,61 @@ sap.ui.define([
             console.log("Mapped upload results:", Attachments);
             this.getOwnerComponent().getModel("contractModel").setProperty("/attachments", Attachments)
             // inspect in browser dev tools
+        },
+        handleSaveContractBasicInfo: async function () {
+
+            const contractMasterData = this.getModel("contractModel").getData();
+            contractMasterData.attachments = [];
+            contractMasterData.attribute_values = [];
+            contractMasterData.status = "Draft";
+            let oResponse = await this.ODataPost("/Contracts", contractMasterData)
+            if (oResponse) {
+                this.getModel("contractModel").setData(oResponse);
+            }
+
+        },
+        handleSaveasDraftContractDetails: async function () {
+            const contractMasterData = this.getModel("contractModel").getData();
+            if (!this.contractId) {
+                contractMasterData.attribute_values = this.convertModelDataToAttributeValues();
+                contractMasterData.status = "Draft";
+                let oContext = await this.ODataPost("/Contracts", contractMasterData);
+                oContext.created().then(() => {
+                    try {
+                        let oData = oContext.getObject(); // entity from backend
+                        console.log("New entity created:", oData);
+                        this.onNavigation('Contracts')
+                    } catch (err) {
+                        reject(err);
+                    }
+                }).catch((err) => {
+                    console.error("Create failed:", err);
+                    reject(err);
+                });
+            }
+
+        },
+        convertModelDataToAttributeValues: function () {
+            const modelData = this.getModel("Details").getData();
+            const result = [];
+
+            if (!modelData || !Array.isArray(modelData.AttributeGroups)) return result;
+
+            modelData.AttributeGroups.forEach(group => {
+                const groupId = group.Attribute_Groups_ID;
+                (group.Attributes || []).forEach(attr => {
+                    const rawValue = (typeof attr.Value !== "undefined" && attr.Value !== null) ? attr.Value : "";
+                    const valueJson = rawValue;
+
+                    result.push({
+                        attribute_groups_ID: groupId,
+                        attributes_ID: attr.Attribute_ID,
+                        valueJson: valueJson
+                    });
+                });
+            });
+
+            return result;
         }
 
     });

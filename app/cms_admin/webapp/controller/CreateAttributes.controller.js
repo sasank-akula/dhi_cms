@@ -1,3 +1,4 @@
+
 sap.ui.define([
     "./BaseController",
     "sap/m/MessageToast",
@@ -15,7 +16,38 @@ sap.ui.define([
             onInit: function () {
                 this.getRouter().getRoute("Create Attributes").attachPatternMatched(this._onObjectMatched, this);
             },
+            onDeleteRow: function (oEvent) {
+                debugger
+                const oModel = this.getView().getModel("appModel");
 
+                // Get row index in the table
+                const oContext = oEvent.getSource().getBindingContext("appModel");
+                const iIndex = oContext.getPath().split("/").pop();
+
+                const aRows = oModel.getProperty("/Attributes/combovalues/results");
+
+                aRows.splice(iIndex, 1);
+
+                oModel.setProperty("/Attributes/combovalues/results", aRows);
+            },
+            onAddRow: function () {
+                const oModel = this.getView().getModel("appModel");
+                let aRows = oModel.getProperty("/Attributes/combovalues/results");
+                if (!aRows) {
+                    let pay = {
+                        "results": []
+                    }
+                    oModel.setProperty("/Attributes/combovalues", pay);
+                }
+                debugger
+                // Create array if not defined
+                if (!Array.isArray(aRows)) {
+                    aRows = [];
+                }
+
+                aRows.push({ value: "" });
+                oModel.setProperty("/Attributes/combovalues/results", aRows);
+            },
             _onObjectMatched: function (oEvent) {
                 var sRouteName = oEvent.getParameter("name");
                 this.attributeId = oEvent.getParameter("arguments").attributeId;
@@ -28,7 +60,7 @@ sap.ui.define([
                 this.getView().byId("createAttributeTitle").setText(sTitle);
                 if (!this.attributeId) {
                     this.getModel("appModel").setProperty("/Attributes", {});
-
+                    this.getModel("appModel").setProperty("/Attributes/type", "string");
                 } else {
                     this._fnReadAttributes(this.attributeId);
                 }
@@ -41,9 +73,9 @@ sap.ui.define([
                 debugger
                 var that = this;
                 this.getModel("oDataV2").read("/Attributes(" + attributeId + ")", {
-                    // urlParameters: {
-                    //     "$expand": "integration"
-                    // },
+                    urlParameters: {
+                        "$expand": "combovalues"
+                    },
                     success: function (oData, oResponce) {
                         debugger
                         // var aSystems = oData.integration.results.map(function (item) {
@@ -66,7 +98,7 @@ sap.ui.define([
 
             onSave: async function () {
                 let bValid = true;
-
+debugger
                 const oNameInput = this.byId("attributeNameInput");
                 const oTypeSelect = this.byId("AttributeTypeSelect");
                 const oAliasInput = this.byId("aliasNameAttrInput");
@@ -169,15 +201,16 @@ sap.ui.define([
                 var selectedKey = oEvent.getParameter("selectedItem").getKey();
                 var oComboBox = this.byId("associationsSelect");
                 var oComboInput = this.byId("attributeTypeInput");
-                // if(selectedKey == "association" || selectedKey == "array" || selectedKey == "boolean") {
                 oComboBox.setValue("");
-                // }
-                if (selectedKey == "number" || selectedKey == "integer") {
+                if (selectedKey == "number" || selectedKey == "integer")
                     oComboInput.setType("Number");
-                }
-                else {
+                else
                     oComboInput.setType("Text");
+                if (selectedKey == 'boolean' || selectedKey == 'select' || selectedKey == 'date') {
+                    this.getModel("appModel").setProperty("/Attributes/maxlength", null);
+                    this.getModel("appModel").setProperty("/Attributes/minlength", null);
                 }
+
             },
 
             resetValueStates: function (oEvent) {
@@ -194,6 +227,10 @@ sap.ui.define([
                 var oBundle = this.getResourceBundle();
                 var oODataModel = this.getModel();
                 var oModel = this.getModel("appModel").getData().Attributes;
+                // if (oModel.type === "date" || oModel.value instanceof Date) {
+                //     oModel.value = this.formatter.formatDateToString(oModel.value);
+                // }
+
                 var payload = {
                     "ID": oModel.ID,
                     // "attribute_id": oModel.attribute_id,
@@ -206,8 +243,11 @@ sap.ui.define([
                     "status": oModel.status,
                     "is_mandatory": this.byId("isMandatorySwitch").getState(),
                     "minlength": oModel.minlength,
-                    "maxlength": oModel.maxlength
+                    "maxlength": oModel.maxlength,
+                    "combovalues": oModel.type === 'select' ? oModel.combovalues.results : [] || []
                 };
+
+                debugger
 
                 //Creating a new attribute.
                 if (oModel.ID === undefined) {
@@ -231,13 +271,13 @@ sap.ui.define([
                                 var oContext = aContexts.value.filter((data) => { return data.name == oModel.name });
                                 console.log(oContext);
                                 MessageBox.success(oBundle.getText("attributeSaveSuccess"), {
-                                actions: [MessageBox.Action.OK],
-                                onClose: function (oAction) {
-                                    if (oAction === MessageBox.Action.OK) {
-                                        that.onNavigation("Attributes");
+                                    actions: [MessageBox.Action.OK],
+                                    onClose: function (oAction) {
+                                        if (oAction === MessageBox.Action.OK) {
+                                            that.onNavigation("Attributes");
+                                        }
                                     }
-                                }
-                            });
+                                });
                                 that._fnReadAttributes(oContext[0].ID);
                                 that._refreshMessageManager();
                             })

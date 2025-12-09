@@ -17,6 +17,7 @@ sap.ui.define([
             },
 
             _onObjectMatched: async function (oEvent) {
+                
                 await this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();

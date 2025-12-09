@@ -1,5 +1,9 @@
 {
     "types": [
+         {
+            "type": "string",
+            "value": "String"
+        },
         {
             "type": "number",
             "value": "Number"
@@ -7,10 +11,6 @@
         {
             "type": "integer",
             "value": "Integer"
-        },
-        {
-            "type": "string",
-            "value": "String"
         },
         {
             "type": "boolean",

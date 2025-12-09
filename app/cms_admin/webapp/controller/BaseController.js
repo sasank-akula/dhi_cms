@@ -64,7 +64,6 @@ sap.ui.define([
         _getFragmentId: function (sComponentId, sViewName, sFragmentName) {
             return sComponentId + `---${sViewName}--${sFragmentName}`;
         },
-
         onNavigation: async function (sNavigationTarget) {
             var oRouter = this.getOwnerComponent().getRouter();
             var sNavigationTarget;

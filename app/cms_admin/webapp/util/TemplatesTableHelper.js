@@ -8,14 +8,14 @@ sap.ui.define([
 
     /**
      * Constructor for Table Helper object
-     * @memberof com.pimx.prodsphere.pxm.util.TemplatesTableHelper
+     * @memberof com.dhi.cms.cmsadmin.util.TemplatesTableHelper
      * @public
      */
     var TableHelper = BaseObject.extend("com.dhi.cms.cmsadmin.util.TemplatesTableHelper", {});
 
     /**
      * Exit handler to destroy the instance
-     * @memberof com.pimx.prodsphere.pxm.util.TemplatesTableHelper
+     * @memberof com.dhi.cms.cmsadmin.util.TemplatesTableHelper
      * @public
      */
     TableHelper.onExit = function () {
@@ -27,7 +27,7 @@ sap.ui.define([
 
     /**
      * Export the data from the Products table
-     * @memberof com.pimx.prodsphere.pxm.util.TemplatesTableHelper
+     * @memberof com.dhi.cms.cmsadmin.util.TemplatesTableHelper
      * @public
      * @param {sap.ui.base.Event} event The event object 
      */
@@ -53,7 +53,7 @@ sap.ui.define([
 
     /**
      * Returns the columns array of table
-     * @memberof com.pimx.prodsphere.pxm.util.TemplatesTableHelper
+     * @memberof com.dhi.cms.cmsadmin.util.TemplatesTableHelper
      * @public
      * @static
      * @returns {Array} columns - Table columns array
@@ -62,7 +62,7 @@ sap.ui.define([
         var columns = [];
         columns.push({
             label: 'ID',
-            property: 'template_id',
+            property: 'appModel>ID',
             type: EdmType.String
         });
         columns.push({

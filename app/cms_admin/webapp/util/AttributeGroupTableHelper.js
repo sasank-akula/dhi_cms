@@ -106,22 +106,22 @@ sap.ui.define([
         var columns = [];
         columns.push({
             label: 'ID',
-            property: 'attribute_group_id',
+            property: 'ID',
             type: EdmType.String
         });
         columns.push({
             label: 'Attribute Group Name',
-            property: 'name',
+            property: 'NAME',
             type: EdmType.String
         });
         columns.push({
             label: 'Attribute Group Alias Name',
-            property: 'alias',
+            property: 'ALIAS',
             type: EdmType.String
         });
         columns.push({
             label: 'Associated Templates',
-            property: 'name',
+            property: 'TEMPLATE_NAME',
             type: EdmType.String
         });
         return columns;

@@ -65,11 +65,11 @@ sap.ui.define([
             return sComponentId + `---${sViewName}--${sFragmentName}`;
         },
 
-        onNavigation: function (sNavigationTarget) {
+        onNavigation: async function (sNavigationTarget) {
             var oRouter = this.getOwnerComponent().getRouter();
             var sNavigationTarget;
             if (sNavigationTarget) {
-                oRouter.navTo(sNavigationTarget);
+                await oRouter.navTo(sNavigationTarget);
             } else {
                 console.error("Navigation target not defined.");
             }
@@ -84,89 +84,89 @@ sap.ui.define([
          * @private
          * @param {string} sNavigationTarget the navigation target
          */
-        _updateBreadcrumbs: function (sNavigationTarget) {
-            var sComponentId = this.getOwnerComponent().getId();
-            var oBreadcrumbs = Fragment.byId(this._getFragmentId(sComponentId, "App", "ToolPageHeader"), "breadcrumbs");
-            if (!oBreadcrumbs) {
-                console.error("Breadcrumbs control not found.");
-                return;
-            }
-            var that = this;
-            var i18nModel = this.getView().getModel("i18n");
-            var i18nBundle = i18nModel ? i18nModel.getResourceBundle() : null;
-            if (!i18nBundle) {
-                console.error("i18n resource bundle not found.");
-                return;
-            }
-            var aMainSections = ["Dashboard", "Products", "Attributes", "Attribute Groups", "Templates", "Catalogue"];
-            var oSubPageMapping = {
-                "Create Products": "Products",
-                "Create Attributes": "Attributes",
-                "Create Attribute Group": "Attribute Groups",
-                "Create Template": "Templates",
-                "Create Catalogue": "Catalogue"
-            };
-            var getTranslatedText = function (key) {
-                return i18nBundle.getText("Breadcrumbs_" + key.replace(/\s/g, "_"), key);
-            };
-            var aNewBreadcrumbs = [];
-            var sLastBreadcrumbText = "";
-            // Check if editing an existing item using appModel
-            var isEditMode = this.getModel("appModel").getProperty("/isEditMode");
-            // First breadcrumb (Prodsphere)
-            aNewBreadcrumbs.push(new Link({
-                text: "Prodsphere",
-                press: function () {
-                    that.getRouter().navTo("Dashboard");
-                }
-            }));
-            if (sNavigationTarget === "Dashboard") {
-                sLastBreadcrumbText = getTranslatedText("Dashboard");
-            } else {
-                var sMainSection = aMainSections.find(section => sNavigationTarget.includes(section));
-                var sParentSection = oSubPageMapping[sNavigationTarget];
-                // Avoid duplicate breadcrumbs for main sections
-                if (sParentSection) {
-                    aNewBreadcrumbs.push(new Link({
-                        text: getTranslatedText(sParentSection),
-                        press: function () {
-                            that.getRouter().navTo(sParentSection);
-                        }
-                    }));
-                } else if (sMainSection && sMainSection !== sNavigationTarget) {
-                    aNewBreadcrumbs.push(new Link({
-                        text: getTranslatedText(sMainSection),
-                        press: function () {
-                            that.getRouter().navTo(sMainSection);
-                        }
-                    }));
-                }
-                // Set last breadcrumb text based on edit mode
-                if (isEditMode) {
-                    if (sNavigationTarget === "Create Products") {
-                        sLastBreadcrumbText = getTranslatedText("Update Product");
-                    } else if (sNavigationTarget === "Create Attributes") {
-                        sLastBreadcrumbText = getTranslatedText("Update Attribute");
-                    } else if (sNavigationTarget === "Create Attribute Group") {
-                        sLastBreadcrumbText = getTranslatedText("Update Attribute Group");
-                    } else if (sNavigationTarget === "Create Template") {
-                        sLastBreadcrumbText = getTranslatedText("Update Template");
-                    } else if (sNavigationTarget === "Create Catalogue") {
-                        sLastBreadcrumbText = getTranslatedText("Update Catalogue");
-                    } else {
-                        sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
-                    }
-                } else {
-                    sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
-                }
-            }
-            // Remove existing breadcrumbs and add new ones except last one
-            oBreadcrumbs.removeAllLinks();
-            aNewBreadcrumbs.forEach(oLink => oBreadcrumbs.addLink(oLink));
-            oBreadcrumbs.setCurrentLocationText(sLastBreadcrumbText);
-            // Reset edit mode flag after setting breadcrumbs
-            this.getModel("appModel").setProperty("/isEditMode", false);
-        },
+        // : function (sNavigationTarget) {
+        //     var sComponentId = this.getOwnerComponent().getId();
+        //     var oBreadcrumbs = Fragment.byId(this._getFragmentId(sComponentId, "App", "ToolPageHeader"), "breadcrumbs");
+        //     if (!oBreadcrumbs) {
+        //         console.error("Breadcrumbs control not found.");
+        //         return;
+        //     }
+        //     var that = this;
+        //     var i18nModel = this.getView().getModel("i18n");
+        //     var i18nBundle = i18nModel ? i18nModel.getResourceBundle() : null;
+        //     if (!i18nBundle) {
+        //         console.error("i18n resource bundle not found.");
+        //         return;
+        //     }
+        //     var aMainSections = ["Dashboard", "Products", "Attributes", "Attribute Groups", "Templates", "Catalogue"];
+        //     var oSubPageMapping = {
+        //         "Create Products": "Products",
+        //         "Create Attributes": "Attributes",
+        //         "Create Attribute Group": "Attribute Groups",
+        //         "Create Template": "Templates",
+        //         "Create Catalogue": "Catalogue"
+        //     };
+        //     var getTranslatedText = function (key) {
+        //         return i18nBundle.getText("Breadcrumbs_" + key.replace(/\s/g, "_"), key);
+        //     };
+        //     var aNewBreadcrumbs = [];
+        //     var sLastBreadcrumbText = "";
+        //     // Check if editing an existing item using appModel
+        //     var isEditMode = this.getModel("appModel").getProperty("/isEditMode");
+        //     // First breadcrumb (Prodsphere)
+        //     aNewBreadcrumbs.push(new Link({
+        //         text: "Prodsphere",
+        //         press: function () {
+        //             that.getRouter().navTo("Dashboard");
+        //         }
+        //     }));
+        //     if (sNavigationTarget === "Dashboard") {
+        //         sLastBreadcrumbText = getTranslatedText("Dashboard");
+        //     } else {
+        //         var sMainSection = aMainSections.find(section => sNavigationTarget.includes(section));
+        //         var sParentSection = oSubPageMapping[sNavigationTarget];
+        //         // Avoid duplicate breadcrumbs for main sections
+        //         if (sParentSection) {
+        //             aNewBreadcrumbs.push(new Link({
+        //                 text: getTranslatedText(sParentSection),
+        //                 press: function () {
+        //                     that.getRouter().navTo(sParentSection);
+        //                 }
+        //             }));
+        //         } else if (sMainSection && sMainSection !== sNavigationTarget) {
+        //             aNewBreadcrumbs.push(new Link({
+        //                 text: getTranslatedText(sMainSection),
+        //                 press: function () {
+        //                     that.getRouter().navTo(sMainSection);
+        //                 }
+        //             }));
+        //         }
+        //         // Set last breadcrumb text based on edit mode
+        //         if (isEditMode) {
+        //             if (sNavigationTarget === "Create Products") {
+        //                 sLastBreadcrumbText = getTranslatedText("Update Product");
+        //             } else if (sNavigationTarget === "Create Attributes") {
+        //                 sLastBreadcrumbText = getTranslatedText("Update Attribute");
+        //             } _updateBreadcrumbselse if (sNavigationTarget === "Create Attribute Group") {
+        //                 sLastBreadcrumbText = getTranslatedText("Update Attribute Group");
+        //             } else if (sNavigationTarget === "Create Template") {
+        //                 sLastBreadcrumbText = getTranslatedText("Update Template");
+        //             } else if (sNavigationTarget === "Create Catalogue") {
+        //                 sLastBreadcrumbText = getTranslatedText("Update Catalogue");
+        //             } else {
+        //                 sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
+        //             }
+        //         } else {
+        //             sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
+        //         }
+        //     }
+        //     // Remove existing breadcrumbs and add new ones except last one
+        //     oBreadcrumbs.removeAllLinks();
+        //     aNewBreadcrumbs.forEach(oLink => oBreadcrumbs.addLink(oLink));
+        //     oBreadcrumbs.setCurrentLocationText(sLastBreadcrumbText);
+        //     // Reset edit mode flag after setting breadcrumbs
+        //     this.getModel("appModel").setProperty("/isEditMode", false);
+        // },
 
         confirmAction: function (sMessage, actions) {
             let promise = new Promise((resolve, reject) => {

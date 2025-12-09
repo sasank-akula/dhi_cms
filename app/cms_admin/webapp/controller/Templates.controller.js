@@ -16,8 +16,8 @@ sap.ui.define([
                 this.getRouter().getRoute("Templates").attachPatternMatched(this._onObjectMatched, this);
             },
 
-            _onObjectMatched: function (oEvent) {
-                this._refreshTable();
+            _onObjectMatched: async function (oEvent) {
+                await this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();
             },
@@ -107,13 +107,14 @@ sap.ui.define([
 
             onTemplateEdit: function (event) {
                 let context = event.getSource().getBindingContext();
-                let { ID } = context.getObject();
+                let { ID } = context.getObject();   ``
                 this.getRouter().navTo("Create Template", {
                     templateId: ID
                 });
             },
 
             _refreshTable: function () {
+                debugger
                 this.byId("tblTemplates").getBinding("rows").refresh();
             },
 

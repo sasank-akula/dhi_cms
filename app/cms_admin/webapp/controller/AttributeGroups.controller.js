@@ -15,8 +15,8 @@ sap.ui.define([
                 this.getRouter().getRoute("Attribute Groups").attachPatternMatched(this._onObjectMatched, this);
             },
 
-            _onObjectMatched: function (oEvent) {
-                this._refreshTable();
+            _onObjectMatched: async function (oEvent) {
+                await this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();
                 this._getAttributeGrpList();
@@ -60,7 +60,7 @@ sap.ui.define([
 
             /**
              * Handler to trigger navigation for Attribute group edit page
-             * @memberof com.pimx.prodsphere.pxm.controller.AttributeGroups
+             * @memberof com.dhi.cms.cmsadmin.controller.AttributeGroups
              * @public
              * @param {sap.ui.base.Event} event The event object
              */
@@ -74,7 +74,7 @@ sap.ui.define([
 
             /**
              * Handler to delete Attribute from Attribute group page
-             * @memberof com.pimx.prodsphere.pxm.controller.AttributeGroups
+             * @memberof com.dhi.cms.cmsadmin.controller.AttributeGroups
              * @public
              * @param {sap.ui.base.Event} event The event object
              */
@@ -118,7 +118,7 @@ sap.ui.define([
 
             /**
              * Refresh the Attribute Groups table
-             * @memberof com.pimx.prodsphere.pxm.controller.AttributeGroups
+             * @memberof com.dhi.cms.cmsadmin.controller.AttributeGroups
              * @private
              */
             _refreshTable: function () {

@@ -13,20 +13,16 @@
             "value": "String"
         },
         {
-            "type": "derived",
-            "value": "Derived"
-        },
-        {
             "type": "boolean",
             "value": "Boolean"
         },
         {
-            "type": "array",
-            "value": "Array"
+            "type": "select",
+            "value": "Select"
         },
         {
-            "type": "association",
-            "value": "Association"
+            "type": "date",
+            "value": "Date"
         }
     ]
 }

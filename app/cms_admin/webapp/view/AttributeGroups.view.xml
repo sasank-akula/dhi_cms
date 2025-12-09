@@ -16,11 +16,12 @@
                         <Button id="createAttributes" text="{i18n>Attribute_Group_Create}" icon="sap-icon://add-document" press="onNavigation('Create Attribute Group')" type="Emphasized"/>
                         <Button id="clearFilters" enabled="false" visible="true" text="{i18n>Attribute_Group_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attribute_Group_ClearFiltersTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Attribute_Group_PersonalizationTooltip}" />
-                        <Button id="exportProducts" press="handler.onExportData" icon="sap-icon://excel-attachment" tooltip="{i18n>Attribute_Group_ExportTooltip}" />
+                        <Button id="exportProducts" press="handler.onExportData" enabled="{= ${appModel>/AttributeGroupCount} > 0 }"
+ icon="sap-icon://excel-attachment" tooltip="{i18n>Attribute_Group_ExportTooltip}" />
                     </OverflowToolbar>
                 </table:extension>
                 <table:columns>
-                    <table:Column width="125px" filterProperty="ATTRIBUTE_GROUP_ID" sortProperty="ATTRIBUTE_GROUP_ID" resizable="true" autoResizable="true" headerMenu="menu">
+                    <table:Column width="125px" filterProperty="ID" sortProperty="ID" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attribute_Group_ID}" wrapping="true"/>
                         <table:template>
                             <Text text="{appModel>ID}" wrapping="false" textAlign="Left" width="100%"/>

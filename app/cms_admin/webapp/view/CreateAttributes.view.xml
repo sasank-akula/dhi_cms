@@ -33,19 +33,26 @@
                                 <VBox class="sapUiLargeMargin">
 
                                     <VBox class="sapUiMediumMarginBottom">
-                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_ID}" labelFor="attributeIdInput"/>
-                                        <Input id="attributeIdInput" editable="false" placeholder="{i18n>Create_Attribute_Attribute_ID_Placeholder}" value="{appModel>/Attributes/ID}"/>
+                                        <Label class="sapUiTinyMarginBottom" visible="{appModel>/isEditMode}" text="{i18n>Create_Attribute_Attribute_ID}" labelFor="attributeIdInput"/>
+                                        <Input id="attributeIdInput" editable="false" visible="{appModel>/isEditMode}" placeholder="{i18n>Create_Attribute_Attribute_ID_Placeholder}" value="{appModel>/Attributes/ID}"/>
                                     </VBox>
 
                                     <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_Name}" labelFor="attributeNameInput" required="true"/>
-                                        <Input id="attributeNameInput" placeholder="{i18n>Create_Attribute_Attribute_Name_Placeholder}" value="{appModel>/Attributes/name}"/>
+                                        <Input  id="attributeNameInput" placeholder="{i18n>Create_Attribute_Attribute_Name_Placeholder}" maxLength="50" value="{appModel>/Attributes/name}"/>
                                     </VBox>
 
-                                    <VBox class="sapUiMediumMarginBottom">
+                                    <!-- <VBox class="sapUiMediumMarginBottom">
                                         <Label text="{i18n>Create_Attribute_Regex}" class="sapUiTinyMarginBottom" labelFor="regexInput"/>
                                         <Input id="regexInput" placeholder="{i18n>Create_Attribute_Regex_Placeholder}" value="{appModel>/Attributes/regex}"/>
+                                    </VBox> -->
+                                    <VBox class="sapUiMediumMarginBottom">
+                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_Type}" labelFor="AttributeTypeSelect" required="true"/>
+                                        <Select id="AttributeTypeSelect" width="100%" items="{attributeTypes>/types}" selectedKey="{appModel>/Attributes/type}" change="attributeTypeChange">
+                                            <core:Item key="{attributeTypes>type}" text="{attributeTypes>value}" />
+                                        </Select>
                                     </VBox>
+
 
                                     <HBox alignItems="Start" justifyContent="End">
                                         <!-- <VBox visible="false">
@@ -56,6 +63,7 @@
                                                 </items>
                                             </Select>
                                         </VBox> -->
+
                                         <VBox alignItems="End" class="sapUiMediumMarginEnd">
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Is_Mandatory}" labelFor="isMandatorySwitch"/>
                                             <Switch id="isMandatorySwitch" customTextOn="Yes" customTextOff="No" state="{appModel>/Attributes/is_mandatory}"/>
@@ -72,29 +80,27 @@
                                     <grid:ResponsiveColumnItemLayoutData columns="auto" />
                                 </f:layoutData>
                                 <VBox class="sapUiLargeMargin">
-
-                                    <VBox class="sapUiMediumMarginBottom">
-                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_Type}" labelFor="AttributeTypeSelect" required="true"/>
-                                        <ComboBox id="AttributeTypeSelect" width="100%" items="{attributeTypes>/types}" value="{appModel>/Attributes/type}" selectionChange="attributeTypeChange">
-                                            <core:Item key="{attributeTypes>type}" text="{attributeTypes>value}" />
-                                        </ComboBox>
-                                    </VBox>
-
                                     <!-- <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} !== 'Association' &amp;&amp; ${appModel>/Attributes/type} !== 'Boolean'}">
                             <Label class="sapUiTinyMarginBottom" text="Value" labelFor="attributeTypeInput"/>
                             <Input id="attributeTypeInput" placeholder="Enter a value" value="{appModel>/Attributes/value}" editable="{= ${appModel>/Attributes/type} === 'Array'}"/>
                         </VBox> -->
 
-                                    <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} !== 'Association'}">
+                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} !== 'select' &amp;&amp; ${appModel>/Attributes/type} !== 'boolean'}">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="attributeTypeInput"/>
-                                        <Input id="attributeTypeInput" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{appModel>/Attributes/value}" />
+                                        <Input  id="attributeTypeInput" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{appModel>/Attributes/value}" />
                                     </VBox>
-
-                                    <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'Association'}">
-                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="associationsSelect" required="false"/>
-                                        <ComboBox id="associationsSelect" width="100%" items="{appModel>/Association}" value="{appModel>/Attributes/value}">
+                                    <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'select'}">
+                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="associationsSelect"/>
+                                        <ComboBox id="associationsSelect"  width="100%" items="{appModel>/Association}" selectedKey="{appModel>/Attributes/value}" value="{appModel>/Attributes/value}">
                                             <core:Item key="{appModel>code}" text="{appModel>targetTable}" />
                                         </ComboBox>
+                                    </VBox>
+                                    <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'boolean'}">
+                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="booleanSelect"/>
+                                        <Select id="booleanSelect" selectedKey="{appModel>/Attributes/value}" width="100%">
+                                            <core:Item key="true" text="true" />
+                                            <core:Item key="false" text="false" />
+                                        </Select>
                                     </VBox>
 
                                     <!-- <VBox class="sapUiMediumMarginBottom">
@@ -105,11 +111,11 @@
                                     <HBox alignItems="Start" justifyContent="SpaceBetween">
                                         <VBox>
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Minimum_Length}" labelFor="attributeMinLength"/>
-                                            <Input id="attributeMinLength" placeholder="{i18n>Create_Attribute_Minimum_Length_Placeholder}" value="{appModel>/Attributes/minlength}" editable="{= ['Boolean', 'Array', 'Association'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
+                                            <Input maxLength="3" id="attributeMinLength" placeholder="{i18n>Create_Attribute_Minimum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/minlength}" editable="{= ['boolean','select'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
                                         </VBox>
                                         <VBox>
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Maximum_Length}" labelFor="attributeMaxLength"/>
-                                            <Input id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}" value="{appModel>/Attributes/maxlength}" editable="{= ['Boolean', 'Array', 'Association'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
+                                            <Input maxLength="3" id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}"  type="Number" value="{appModel>/Attributes/maxlength}" editable="{= ['boolean','select'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
                                         </VBox>
                                     </HBox>
                                 </VBox>
@@ -121,12 +127,12 @@
                                 <VBox class="sapUiLargeMargin">
                                     <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Alias_Name}" labelFor="aliasNameAttrInput" required="true"/>
-                                        <Input id="aliasNameAttrInput" placeholder="{i18n>Create_Attribute_Alias_Name_Placeholder}" value="{appModel>/Attributes/alias}"/>
+                                        <Input maxLength="50" id="aliasNameAttrInput" placeholder="{i18n>Create_Attribute_Alias_Name_Placeholder}" value="{appModel>/Attributes/alias}"/>
                                     </VBox>
 
                                     <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Description}" labelFor="descriptionTextArea"/>
-                                        <TextArea id="descriptionTextArea" class="customMultiInputHeight" placeholder="{i18n>Create_Attribute_Description_Placeholder}" width="100%" value="{appModel>/Attributes/desc}"/>
+                                        <TextArea maxLength="100" growing="true" growingMaxLines="10" id="descriptionTextArea" class="customMultiInputHeight" placeholder="{i18n>Create_Attribute_Description_Placeholder}" width="100%" value="{appModel>/Attributes/desc}"/>
                                     </VBox>
                                 </VBox>
                             </f:GridListItem>

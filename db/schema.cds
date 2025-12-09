@@ -14,7 +14,7 @@ entity Attributes : cuid, managed {
     alias        : String @mandatory;
     type         : String;
     value        : String;
-    regex        : String;
+    // regex        : String;
     status       : String;
     // tags         : String;
     // multilingual : Boolean;
@@ -25,7 +25,8 @@ entity Attributes : cuid, managed {
     maxlength    : Integer;
     minlength    : Integer;
     is_mandatory : Boolean;
-    
+    grpItems : Composition of many AttributeGroupAttribute
+        on grpItems.attribute = $self;
 }
 
 entity AttributeGroupAttribute : cuid, managed {
@@ -43,6 +44,8 @@ entity Attribute_Groups : cuid, managed {
                              on templates.attribute_groups = $self;
     attributes         : Composition of many AttributeGroupAttribute
                              on attributes.attributeGroup = $self;
+    attribute_templates : Composition of many TemplatesAttributeGroups
+                            on attribute_templates.attribute_groups = $self;
 // role               : String(100);
 }
 
@@ -68,15 +71,15 @@ entity ContractsAttributes : cuid, managed {
     key contracts        : Association to Contracts;
     key attribute_groups : Association to Attribute_Groups;
     key attributes       : Association to Attributes;
-        valueJson        : localized LargeString;
+        valueJson        : LargeString;
 }
 @assert.unique: {uniqueProductName: [name]}
 entity Contracts : cuid, managed {
     contract_id      : String(30);
-    name             : localized String
+    name             : String
                                                 @mandatory;
-    description      : localized String;
-    alias            : localized String         @mandatory;
+    description      :  String;
+    alias            :  String         @mandatory;
     start_date       : Date;
     end_date         : Date;
     is_visible       : Boolean;
@@ -121,7 +124,6 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
         on _AttributeGroupsAttr.attribute.ID = _Attributes.ID
     {
         key _Templates.templates.ID           as Template_ID,
-            _Templates.templates.template_id  as Template_No,
             _Templates.templates.name         as Template_Name,
             _Templates.templates.desc         as Template_Description,
 
@@ -131,6 +133,7 @@ define view TemplatePortalCatalogue with parameters TemplateID: String as
 
         key _AttributeGroupsAttr.attribute.ID as Attribute_ID,
             _Attributes.name                  as Attribute_Name,
+            _Attributes.value                  as Attribute_Value,
             _Attributes.type                  as AttributeType,
             _AttributeGroupsAttr.sortID       as AttributeOrder,
             _Attributes.is_mandatory          as Is_Required

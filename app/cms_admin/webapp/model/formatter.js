@@ -2,12 +2,26 @@ sap.ui.define([], () => {
 	"use strict";
 
 	return {
+		toDate: function (sValue) {
+			if (!sValue) return null;
+			// Converts yyyy-MM-dd → JS Date
+			const parts = sValue.split("-");
+			return new Date(parts[0], parts[1] - 1, parts[2]);
+		},
+		formatDateToString: function (oDate) {
+			if (!oDate) return null;
+			// Convert Date → "yyyy-MM-dd"
+			let yyyy = oDate.getFullYear();
+			let mm = String(oDate.getMonth() + 1).padStart(2, "0");
+			let dd = String(oDate.getDate()).padStart(2, "0");
+			return `${yyyy}-${mm}-${dd}`;
+		},
 
 		disableButton: function (status, userRole) {
 			if ((status === "Draft" && (userRole === "catManager" || userRole === "supplier" || userRole === "admin")) ||
 				((status === "Prepare for Sale" || status === "Approved") && (userRole === "catManager" || userRole === "admin")) ||
-				(status === "In Review" && (userRole === "catManager" || userRole === "supChain" || userRole === "admin")) || 
-				(status === "Published" && (userRole === "catManager" || userRole === "admin")) ) {
+				(status === "In Review" && (userRole === "catManager" || userRole === "supChain" || userRole === "admin")) ||
+				(status === "Published" && (userRole === "catManager" || userRole === "admin"))) {
 				return true;
 			} else {
 				return false;
@@ -53,11 +67,11 @@ sap.ui.define([], () => {
 				const date = new Date(dValue);
 				// Format the date and time using Intl.DateTimeFormat
 				return new Intl.DateTimeFormat("en-US", {
-					month: "short", 
-					day: "2-digit", 
+					month: "short",
+					day: "2-digit",
 					year: "numeric",
-					hour: "numeric", 
-					minute: "2-digit", 
+					hour: "numeric",
+					minute: "2-digit",
 					second: "2-digit",
 					hour12: true
 				}).format(date);
@@ -65,28 +79,28 @@ sap.ui.define([], () => {
 		},
 
 		getTranslatedText: function (key) {
-            const i18nModel = this.getView().getModel("i18n");
-            return i18nModel.getResourceBundle().getText(key);
-        },
+			const i18nModel = this.getView().getModel("i18n");
+			return i18nModel.getResourceBundle().getText(key);
+		},
 
 		formatValueJson: function (jsonString) {
 			if (!jsonString) {
 				return "0.00";
 			}
-		
+
 			try {
 				const oValue = jsonString.replace(/\\"/g, '"');
 				const parsed = JSON.parse(oValue);
-		
+
 				if (!parsed || parsed.value == null) {
 					return "0.00";
 				}
-		
+
 				const numericValue = parseFloat(parsed.value);
 				if (isNaN(numericValue)) {
 					return "0.00";
 				}
-		
+
 				return `${numericValue.toFixed(2)}`;
 			} catch (e) {
 				// In case parsing fails

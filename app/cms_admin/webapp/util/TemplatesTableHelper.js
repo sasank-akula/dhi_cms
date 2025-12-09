@@ -62,7 +62,7 @@ sap.ui.define([
         var columns = [];
         columns.push({
             label: 'ID',
-            property: 'appModel>ID',
+            property: 'ID',
             type: EdmType.String
         });
         columns.push({

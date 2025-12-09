@@ -565,11 +565,11 @@ sap.ui.define([
                 oModel.setProperty("/AttributeGroups", aRankedData);
 
                 // Update the title with the new count
-                var oTitle = this.byId("attributeGroupsTitle");
-                var iNewCount = aRankedData.filter(function (item) {
-                    return item.Rank > 0;
-                }).length;
-                oTitle.setText("Attribute Groups (" + iNewCount + ")");
+                // var oTitle = this.byId("attributeGroupsTitle");
+                // var iNewCount = aRankedData.filter(function (item) {
+                //     return item.Rank > 0;
+                // }).length;
+                // oTitle.setText("Attribute Groups (" + iNewCount + ")");
 
                 // Refresh the model to reflect changes
                 oModel.refresh();

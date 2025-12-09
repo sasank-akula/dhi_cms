@@ -3,6 +3,7 @@
     xmlns:core="sap.ui.core"
     xmlns:f="sap.f"
     xmlns:grid="sap.ui.layout.cssgrid"
+    xmlns:table="sap.ui.table"
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     xmlns:l="sap.ui.layout" controllerName="com.dhi.cms.cmsadmin.controller.CreateAttributes">
     <l:ResponsiveSplitter defaultPane="default">
@@ -39,7 +40,7 @@
 
                                     <VBox class="sapUiMediumMarginBottom">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Attribute_Name}" labelFor="attributeNameInput" required="true"/>
-                                        <Input  id="attributeNameInput" placeholder="{i18n>Create_Attribute_Attribute_Name_Placeholder}" maxLength="50" value="{appModel>/Attributes/name}"/>
+                                        <Input id="attributeNameInput" placeholder="{i18n>Create_Attribute_Attribute_Name_Placeholder}" maxLength="50" value="{appModel>/Attributes/name}"/>
                                     </VBox>
 
                                     <!-- <VBox class="sapUiMediumMarginBottom">
@@ -85,14 +86,25 @@
                             <Input id="attributeTypeInput" placeholder="Enter a value" value="{appModel>/Attributes/value}" editable="{= ${appModel>/Attributes/type} === 'Array'}"/>
                         </VBox> -->
 
-                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} !== 'select' &amp;&amp; ${appModel>/Attributes/type} !== 'boolean'}">
+                                    <VBox class="sapUiMediumMarginBottom" visible="{= ['boolean','select','date'].indexOf(${appModel>/Attributes/type}) === -1 }">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="attributeTypeInput"/>
-                                        <Input  id="attributeTypeInput" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{appModel>/Attributes/value}" />
+                                        <Input id="attributeTypeInput" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{appModel>/Attributes/value}" />
                                     </VBox>
+                                    <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'date'}">
+
+                                        <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="attributeTypeDate"/>
+
+                                        <DatePicker id="attributeTypeDate" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{
+                    path: 'appModel>/Attributes/value',
+                    formatter: 'formatter.toDate'
+                }" />
+                                    </VBox>
+
+
                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'select'}">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="associationsSelect"/>
-                                        <ComboBox id="associationsSelect"  width="100%" items="{appModel>/Association}" selectedKey="{appModel>/Attributes/value}" value="{appModel>/Attributes/value}">
-                                            <core:Item key="{appModel>code}" text="{appModel>targetTable}" />
+                                        <ComboBox id="associationsSelect" width="100%" items="{appModel>/Attributes/combovalues/results}" selectedKey="{appModel>/Attributes/value}" value="{appModel>/Attributes/value}">
+                                            <core:Item key="{appModel>value}" text="{appModel>value}" />
                                         </ComboBox>
                                     </VBox>
                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'boolean'}">
@@ -111,11 +123,11 @@
                                     <HBox alignItems="Start" justifyContent="SpaceBetween">
                                         <VBox>
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Minimum_Length}" labelFor="attributeMinLength"/>
-                                            <Input maxLength="3" id="attributeMinLength" placeholder="{i18n>Create_Attribute_Minimum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/minlength}" editable="{= ['boolean','select'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
+                                            <Input maxLength="3" id="attributeMinLength" placeholder="{i18n>Create_Attribute_Minimum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/minlength}" editable="{= ['boolean','select','date'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
                                         </VBox>
                                         <VBox>
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Maximum_Length}" labelFor="attributeMaxLength"/>
-                                            <Input maxLength="3" id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}"  type="Number" value="{appModel>/Attributes/maxlength}" editable="{= ['boolean','select'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
+                                            <Input maxLength="3" id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/maxlength}" editable="{= ['boolean','select','date'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
                                         </VBox>
                                     </HBox>
                                 </VBox>
@@ -137,6 +149,49 @@
                                 </VBox>
                             </f:GridListItem>
                         </f:GridList>
+
+                        <HBox width="100%" renderType="Bare" justifyContent="Center" alignItems="Center" alignContent="Center" visible="{= ${appModel>/Attributes/type} === 'select'}">
+                            <table:Table class="sapUiSmallMargin" id="valuesGridTable" rows="{appModel>/Attributes/combovalues/results}" selectionMode="None" visibleRowCount="5" width="70%" showNoData="true" columnHeaderHeight="40">
+
+                                <table:extension>
+                                    <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">
+                                        <Title text="{i18n>Combo_Title}" titleStyle="H5"/>
+                                        <ToolbarSpacer/>
+                                        <Button id="createComboValue" icon="sap-icon://add" press=".onAddRow" type="Emphasized"/>
+                                        <!-- <Button id="clearFilters" enabled="false" visible="true" text="{i18n>Attributes_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attributes_ClearFiltersTooltip}"/> -->
+                                        <!-- <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Attributes_PersonalizationTooltip}" /> -->
+                                        <!-- <Button id="exportProducts" press="handler.onExportData" icon="sap-icon://excel-attachment" enabled="{= ${appModel>/AttributeCount} > 0 }" tooltip="{i18n>Attributes_ExportTooltip}" /> -->
+                                    </OverflowToolbar>
+                                </table:extension>
+
+                                <table:columns>
+                                    <!-- VALUE COLUMN -->
+
+                                    <table:Column width="50%">
+                                        <Label text="{i18n>Combo_Values}" wrapping="true"/>
+                                        <table:template>
+                                            <Input width="100%" maxLength="20" value="{appModel>value}" />
+                                        </table:template>
+                                    </table:Column>
+
+                                    <!-- DELETE COLUMN -->
+
+                                    <table:Column width="50%" hAlign="Center">
+                                        <Label text="{i18n>Combo_Actions}" wrapping="true"/>
+                                        <table:template>
+                                            <Button icon="sap-icon://delete" type="Reject" press=".onDeleteRow" />
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                            </table:Table>
+                        </HBox>
+
+
+
+
+
+
+
                         <!-- <f:GridList class="sapUiMediumMarginBegin sapUiSmallMarginTop" width="96%" visible="{appModel>/isIntegrationVisible}">
                             <f:GridListItem>
                                 <f:layoutData>

@@ -13,8 +13,9 @@ sap.ui.define([
          onInit: function () {
                 this.getRouter().getRoute("Attributes").attachPatternMatched(this._onObjectMatched, this);
             },
-            _onObjectMatched: function (oEvent) {
-                this._refreshTable();
+            _onObjectMatched: async function (oEvent) {
+                debugger
+                await this._refreshTable();
                 this._setPersonalization();
                 this.clearAllFilters();
             },
@@ -49,6 +50,7 @@ sap.ui.define([
              * @private
              */
             _refreshTable: function () {
+                debugger
                 this.byId("tblAttributes").getBinding("rows").refresh();
             },
 

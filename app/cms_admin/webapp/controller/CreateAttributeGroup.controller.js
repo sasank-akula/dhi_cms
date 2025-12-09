@@ -26,7 +26,6 @@ sap.ui.define([
                 var attributeGroupId = oArgs.attributeGroupId;
                 var isEditMode = !!attributeGroupId;
                 this.getModel("appModel").setProperty("/isEditMode", isEditMode);
-                // this._updateBreadcrumbs(sRouteName);
                 this.attributeGroupId = attributeGroupId;
                 this._fnRegisterMessageManager();
                 var sTitle = isEditMode
@@ -171,7 +170,7 @@ sap.ui.define([
                 if (bValid === true) {
                     await this.handleSaveAttributeGroup();
                     await this.byId("attributeGrpNameInput").setValueState("None");
-                    await this.onNavigation('Attribute Groups')
+                    
                     // this.byId("aliasNameInputAtrGrp").setValueState("None");
                 }
             },
@@ -198,14 +197,13 @@ sap.ui.define([
                             "sortID": associateAttributes.Rank
                         };
 
-                        // Include attribute_ID if it already exists (for reordering)
+                        // Include attribute_ID if it already exists (for reordering)`
                         if (associateAttributes.attribute && associateAttributes.attribute.ID) {
                             attributesPayload.attribute_ID = associateAttributes.attribute.ID;
                         } else {
                             // For new attribute groups, include the ID of the associated attribute group
                             attributesPayload.attribute_ID = associateAttributes.ID; // Assuming 'ID' is the attribute ID
                         }
-
                         payload.attributes.push(attributesPayload);
                     }
                 }
@@ -227,13 +225,21 @@ sap.ui.define([
                             var sNewGroupPath = that.oContext.getPath();
                             var newAttributeGroupId = that.extractIdFromPath(sNewGroupPath);
                             that._refreshMessageManager();
-                            MessageBox.success(oBundle.getText("attributeGroupSaveSuccess"));
-                            debugger
-                            setTimeout(function () {
+                             setTimeout(function () {
                                 that._fnReadExistingAttributeGroup(newAttributeGroupId).then(function (oData) {
-                                    that.getModel("appModel").setProperty("/AttributeGroup/attribute_group_id", oData.attribute_group_id);
+                                    that.getModel("appModel").setProperty("/AttributeGroup/ID", oData.ID);
                                 });
                             }, 1000);
+                            MessageBox.success(oBundle.getText("attributeGroupSaveSuccess"), {
+                                actions: [MessageBox.Action.OK],
+                                onClose: function (oAction) {
+                                    if (oAction === MessageBox.Action.OK) {
+                                        that.onNavigation("Attribute Groups");
+                                    }
+                                }
+                            });
+                            debugger
+                           
                         }
                     });
                     // this.oContext.created().then(function () {
@@ -258,7 +264,14 @@ sap.ui.define([
                             // Proceed with the update using the prepared payload directly
                             that.getModel("oDataV2").update("/Attribute_Groups(" + oModel.ID + ")?$expand=attributes($select=ID,sortID)", payload, {
                                 success: function (oData, oResponse) {
-                                    MessageBox.success(oBundle.getText("attributeGroupUpdateSuccess"));
+                                    MessageBox.success(oBundle.getText("attributeGroupUpdateSuccess"),{
+                                actions: [MessageBox.Action.OK],
+                                onClose: function (oAction) {
+                                    if (oAction === MessageBox.Action.OK) {
+                                        that.onNavigation("Attribute Groups");
+                                    }
+                                }
+                            });
                                 },
                                 error: function (oError) {
                                     MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
@@ -280,6 +293,7 @@ sap.ui.define([
             },
 
             onAddAttributes: function () {
+                
                 debugger
                 var that = this;
                 var oView = this.getView();
@@ -291,6 +305,7 @@ sap.ui.define([
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
+                        
                         return oDialog;
                     });
                 }
@@ -310,6 +325,7 @@ sap.ui.define([
                 }
 
                 this._pDialog.then(function (oDialog) {
+                    oDialog.clearSelection();
                     oDialog.open();
                 });
             },

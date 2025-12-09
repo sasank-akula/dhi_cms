@@ -20,15 +20,7 @@ sap.ui.define([
                 var sRouteName = oEvent.getParameter("name");
                 var oArgs = oEvent.getParameter("arguments");
                 var templateId = oArgs.templateId;
-                var isEditMode = !!templateId;
-                this.getModel("appModel").setProperty("/isEditMode", isEditMode);
-                this._updateBreadcrumbs(sRouteName);
-                this.templateId = templateId;
-                this._fnRegisterMessageManager();
-                var sTitle = isEditMode ? this.getResourceBundle().getText("Update_Template_Title") : this.getResourceBundle().getText("Create_Template_Title");
-                this.getView().byId("createTemplateTitle").setText(sTitle);
-                this.templateRankLogic();
-                if (templateId) {
+                 if (templateId) {
                     this._fnReadExistingTemplate(templateId);
                 } else {
                     this._fnReadAttributeGroup();
@@ -36,6 +28,15 @@ sap.ui.define([
                     this.getModel("appModel").setProperty("/Template", []);
                     this.getModel("appModel").setProperty("/AttributeGroups", []);
                 }
+                var isEditMode = !!templateId;
+                this.getModel("appModel").setProperty("/isEditMode", isEditMode);
+                // this._updateBreadcrumbs(sRouteName);
+                this.templateId = templateId;
+                this._fnRegisterMessageManager();
+                var sTitle = isEditMode ? this.getResourceBundle().getText("Update_Template_Title") : this.getResourceBundle().getText("Create_Template_Title");
+                this.getView().byId("createTemplateTitle").setText(sTitle);
+                this.templateRankLogic();
+               
             },
 
             templateRankLogic: function () {
@@ -112,6 +113,7 @@ sap.ui.define([
             },
 
             _fnReadExistingTemplate: function (templateId) {
+                debugger
                 var that = this;
                 // Construct the OData service path for the Templates entity
                 var sPath = "/Templates(" + templateId + ")";
@@ -171,7 +173,7 @@ sap.ui.define([
             onAddAttributeGroup: function () {
                 var that = this;
                 var oView = this.getView();
-
+                
                 if (!this._pDialog) {
                     this._pDialog = Fragment.load({
                         id: oView.getId(),
@@ -184,7 +186,7 @@ sap.ui.define([
                     });
                 }
                 // After opening the dialog, call _fnReadAttributeGroup to refresh the data
-                // this._fnReadAttributeGroup();
+                this._fnReadAttributeGroup();
                 // Initialize the rank counter based on existing attributes
                 var oAppModel = this.getModel("appModel");
                 var aAssociatedAttributeGroups = oAppModel.getProperty("/AttributeGroups") || [];
@@ -201,6 +203,7 @@ sap.ui.define([
                 //     oDialog.open();
                 // });
                 this._pDialog.then(function (oDialog) {
+                    oDialog.clearSelection();
                     oDialog.open();
                 });
 
@@ -307,7 +310,7 @@ sap.ui.define([
             },
 
             //Validation check
-            onSave: function () {
+            onSave: async function () {
                 var bValid = true;
                 var templateName = this.byId("templateNameInput").getValue();
                 var templateDesc = this.byId("templateDescInput").getValue();
@@ -320,10 +323,10 @@ sap.ui.define([
                     this.byId("templateNameInput").setValueState("None");
                 }
                 if (bValid === true) {
-                    this.handleSaveTemplate();
                     this.byId("templateNameInput").setValueState("None");
                     this.byId("templateDescInput").setValueState("None");
-                    this.onNavigation('Templates')
+                    await this.handleSaveTemplate();
+
                 }
             },
 
@@ -388,12 +391,19 @@ sap.ui.define([
                             var sNewGroupPath = that.oContext.getPath();
                             var newTemplateId = that.extractIdFromPath(sNewGroupPath);
                             that._refreshMessageManager();
-                            MessageBox.success(oBundle.getText("templateSaved"));
                             setTimeout(function () {
                                 that._fnReadExistingTemplate(newTemplateId).then(function (oData) {
                                     that.getModel("appModel").setProperty("/Template/template_id", oData.template_id);
                                 });
                             }, 1000);
+                            MessageBox.success(oBundle.getText("templateSaved"), {
+                                actions: [MessageBox.Action.OK],
+                                onClose: function (oAction) {
+                                    if (oAction === MessageBox.Action.OK) {
+                                        that.onNavigation("Templates");
+                                    }
+                                }
+                            });
                         }
                     });
                 } else {
@@ -404,7 +414,14 @@ sap.ui.define([
                             // Proceed with the update using the prepared payload directly
                             that.getModel("oDataV2").update("/Templates(" + oModel.ID + ")?$expand=attribute_groups($select=ID,sortID)", payload, {
                                 success: function (oData, oResponse) {
-                                    MessageBox.success(oBundle.getText("templateUpdated"));
+                                    MessageBox.success(oBundle.getText("templateUpdated"), {
+                                        actions: [MessageBox.Action.OK],
+                                        onClose: function (oAction) {
+                                            if (oAction === MessageBox.Action.OK) {
+                                                that.onNavigation("Templates");
+                                            }
+                                        }
+                                    });
                                 },
                                 error: function (oError) {
                                     MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
@@ -426,6 +443,7 @@ sap.ui.define([
 
 
             onDialogClose: function (oEvent) {
+                debugger
                 let oBundle = this.getResourceBundle();
                 var aContexts = oEvent.getParameter("selectedContexts");
 
@@ -473,10 +491,10 @@ sap.ui.define([
                         return attribute.Rank > 0;
                     }).length;
 
-                    // Update the count in the Title text dynamically
-                    var oTable = this.byId("tblAttrGrpTemplate");
-                    var oTitle = oTable.getHeaderToolbar().getContent()[0]; // Assuming Title is the first element in OverflowToolbar
-                    oTitle.setText("Attribute Groups (" + aRankedAttributeGroupsCount + ")");
+                    // // Update the count in the Title text dynamically
+                    // var oTable = this.byId("tblAttrGrpTemplate2");
+                    // var oTitle = oTable.getHeaderToolbar().getContent()[0]; // Assuming Title is the first element in OverflowToolbar
+                    // oTitle.setText("Attribute Groups (" + aRankedAttributeGroupsCount + ")");
                 } else {
                     MessageToast.show(oBundle.getText("templateNoNewItemSelected"));
                 }

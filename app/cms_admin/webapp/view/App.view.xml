@@ -4,7 +4,7 @@
   xmlns:tnt="sap.tnt"
   xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
   xmlns="sap.m">a
-   <tnt:ToolPage id="mainPage" contentBackgroundDesign="Solid" showHeader="false"  sideExpanded="false">
+   <tnt:ToolPage id="mainPage" contentBackgroundDesign="Solid"   sideExpanded="false">
     <!-- <tnt:header>
       <tnt:ToolHeader id="_IDGenToolHeader">
       </tnt:ToolHeader>

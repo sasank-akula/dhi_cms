@@ -209,11 +209,11 @@ sap.ui.define([
                     // normalize attribute row to a shape your factory expects
                     const attr = {
                         Attribute_ID: row.Attribute_ID,
-                        Attribute_Name: row.Attribute_Name,
+                        Attribute_Name: row.Attribute_Name ,
                         AttributeOrder: row.AttributeOrder || 0,
                         IsMandatory: !!row.Is_Required,
                         AttributeType: row.AttributeType || "String",
-                        AttributeTypeAssociation: row.AttributeTypeAssociation || [],
+                        AttributeTypeAssociation: row.AttributeTypeAssociat || [],
                         Value: attributeValue,
                         IsPortalEnabled: typeof row.IsPortalEnabled !== "undefined" ? row.IsPortalEnabled : null,
                         Portal_ID: row.Portal_ID || null

@@ -27,8 +27,13 @@ entity Attributes : cuid, managed {
     is_mandatory : Boolean;
     grpItems : Composition of many AttributeGroupAttribute
         on grpItems.attribute = $self;
+    combovalues : Composition of many ComboValues on combovalues.attribute=$self
 }
 
+entity ComboValues : cuid {
+    attribute:Association to Attributes;
+    value: String;
+}
 entity AttributeGroupAttribute : cuid, managed {
     attributeGroup  : Association to Attribute_Groups;
     attribute       : Association to Attributes;

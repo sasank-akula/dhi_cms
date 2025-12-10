@@ -184,7 +184,7 @@ sap.ui.define([
 
                 // Description: max from XML
                 const descMaxLen = oDescInput.getMaxLength ? oDescInput.getMaxLength() : 100;
-                if (descValue && descValue.length > descMaxLen) {
+                if ( descValue.length > descMaxLen) {
                     oDescInput.setValueState("Error");
                     oDescInput.setValueStateText(`Description must be less than ${descMaxLen} characters.`);
                     bValid = false;

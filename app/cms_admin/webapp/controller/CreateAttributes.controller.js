@@ -13,7 +13,7 @@ sap.ui.define([
             formatter: formatter,
             onCancel: function () {
                 // Reset main input value states
-                ["attributeNameInput", "AttributeTypeSelect", "aliasNameAttrInput", "descriptionInput", "associationsSelect", "attributeTypeInput"].forEach(function(id) {
+                ["attributeNameInput", "AttributeTypeSelect", "aliasNameAttrInput", "descriptionInput", "associationsSelect", "attributeTypeInput","descriptionTextArea"].forEach(function(id) {
                     var oCtrl = this.byId(id);
                     if (oCtrl && oCtrl.setValueState) {
                         oCtrl.setValueState("None");
@@ -170,11 +170,14 @@ sap.ui.define([
                 // Alias Name: required, max from XML
                 const aliasMaxLen = oAliasInput.getMaxLength ? oAliasInput.getMaxLength() : 50;
                 bValid &= validateField(attrData.alias, oAliasInput, "Alias Name is required.", aliasMaxLen, `Alias Name must be less than ${aliasMaxLen} characters.`);
-                // Description: max from XML
+                // Description: max from XML, only check length if value is present
                 const descTextArea = this.byId("descriptionTextArea");
                 const descMaxLen = descTextArea && descTextArea.getMaxLength ? descTextArea.getMaxLength() : 100;
-                if (descTextArea) {
+                if (descTextArea && attrData.desc) {
                     bValid &= validateField(attrData.desc, descTextArea, "", descMaxLen, `Description must be less than ${descMaxLen} characters.`);
+                } else if (descTextArea) {
+                    descTextArea.setValueState("None");
+                    descTextArea.setValueStateText("");
                 }
                 // If type is number or integer, value must be <= maxlength
                 if ((attrData.type === "number") && oValueInput && attrData.value && attrData.maxlength) {

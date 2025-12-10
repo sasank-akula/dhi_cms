@@ -13,7 +13,7 @@ sap.ui.define([
             formatter: formatter,
             onCancel: function () {
                 // Reset main input value states
-                ["attributeNameInput", "AttributeTypeSelect", "aliasNameAttrInput", "descriptionInput", "associationsSelect", "attributeTypeInput","descriptionTextArea"].forEach(function(id) {
+                ["attributeNameInput", "AttributeTypeSelect", "aliasNameAttrInput", "descriptionInput", "associationsSelect", "attributeTypeInput", "descriptionTextArea", "attributeMaxLength", "attributeMinLength"].forEach(function (id) {
                     var oCtrl = this.byId(id);
                     if (oCtrl && oCtrl.setValueState) {
                         oCtrl.setValueState("None");
@@ -25,7 +25,7 @@ sap.ui.define([
                 var oTable = this.byId("valuesGridTable");
                 if (oTable && oTable.getRows) {
                     var aTableRows = oTable.getRows();
-                    aTableRows.forEach(function(oRow) {
+                    aTableRows.forEach(function (oRow) {
                         var oInput = oRow && oRow.getAggregation && oRow.getAggregation("cells")[0];
                         if (oInput && oInput.setValueState) {
                             oInput.setValueState("None");
@@ -58,7 +58,7 @@ sap.ui.define([
                 var oTable = this.byId("valuesGridTable");
                 if (oTable && oTable.getRows) {
                     var aTableRows = oTable.getRows();
-                    aTableRows.forEach(function(oRow) {
+                    aTableRows.forEach(function (oRow) {
                         var oInput = oRow && oRow.getAggregation && oRow.getAggregation("cells")[0];
                         if (oInput && oInput.setValueState) {
                             oInput.setValueState("None");
@@ -75,13 +75,17 @@ sap.ui.define([
                         "results": []
                     }
                     oModel.setProperty("/Attributes/combovalues", pay);
+                    aRows = pay.results;
                 }
-                debugger
                 // Create array if not defined
                 if (!Array.isArray(aRows)) {
                     aRows = [];
                 }
-
+                // Prevent adding more than 100 rows
+                if (aRows.length >= 100) {
+                    sap.m.MessageBox.error("You cannot add more than 100 Combo Values.");
+                    return;
+                }
                 aRows.push({ value: "" });
                 oModel.setProperty("/Attributes/combovalues/results", aRows);
             },
@@ -146,11 +150,16 @@ sap.ui.define([
                 const oAssocSelect = this.byId("associationsSelect");
                 const oValueInput = this.byId("attributeTypeInput");
 
-                // Helper for required and length
-                const validateField = (value, control, requiredMsg, maxLen, maxLenMsg) => {
+                // Helper for required, min, and max length/values
+                const validateField = (value, control, requiredMsg, maxLen, maxLenMsg, minLen, minLenMsg) => {
                     if (!value || value.toString().trim() === "") {
                         control.setValueState("Error");
                         control.setValueStateText(requiredMsg);
+                        return false;
+                    }
+                    if (minLen && value.length < minLen) {
+                        control.setValueState("Error");
+                        control.setValueStateText(minLenMsg);
                         return false;
                     }
                     if (maxLen && value.length > maxLen) {
@@ -162,49 +171,134 @@ sap.ui.define([
                     return true;
                 };
 
-                // Attribute Name: required, max from XML
+                // Attribute Name: required, min/max from XML
                 const nameMaxLen = oNameInput.getMaxLength ? oNameInput.getMaxLength() : 50;
-                bValid &= validateField(attrData.name, oNameInput, "Attribute Name is required.", nameMaxLen, `Attribute Name must be less than ${nameMaxLen} characters.`);
+                const nameMinLen = oNameInput.getMinLength ? oNameInput.getMinLength() : 0;
+                bValid &= validateField(
+                    attrData.name,
+                    oNameInput,
+                    "Attribute Name is required.",
+                    nameMaxLen,
+                    `Attribute Name must be less than ${nameMaxLen} characters.`,
+                    nameMinLen,
+                    nameMinLen > 0 ? `Attribute Name must be at least ${nameMinLen} characters.` : undefined
+                );
                 // Attribute Type: required
                 bValid &= validateField(attrData.type, oTypeSelect, "Attribute Type is required.");
-                // Alias Name: required, max from XML
+                // Alias Name: required, min/max from XML
                 const aliasMaxLen = oAliasInput.getMaxLength ? oAliasInput.getMaxLength() : 50;
-                bValid &= validateField(attrData.alias, oAliasInput, "Alias Name is required.", aliasMaxLen, `Alias Name must be less than ${aliasMaxLen} characters.`);
-                // Description: max from XML, only check length if value is present
+                const aliasMinLen = oAliasInput.getMinLength ? oAliasInput.getMinLength() : 0;
+                bValid &= validateField(
+                    attrData.alias,
+                    oAliasInput,
+                    "Alias Name is required.",
+                    aliasMaxLen,
+                    `Alias Name must be less than ${aliasMaxLen} characters.`,
+                    aliasMinLen,
+                    aliasMinLen > 0 ? `Alias Name must be at least ${aliasMinLen} characters.` : undefined
+                );
+                // Description: min/max from XML, only check length if value is present
                 const descTextArea = this.byId("descriptionTextArea");
                 const descMaxLen = descTextArea && descTextArea.getMaxLength ? descTextArea.getMaxLength() : 100;
+                const descMinLen = descTextArea && descTextArea.getMinLength ? descTextArea.getMinLength() : 0;
                 if (descTextArea && attrData.desc) {
-                    bValid &= validateField(attrData.desc, descTextArea, "", descMaxLen, `Description must be less than ${descMaxLen} characters.`);
+                    bValid &= validateField(
+                        attrData.desc,
+                        descTextArea,
+                        "",
+                        descMaxLen,
+                        `Description must be less than ${descMaxLen} characters.`,
+                        descMinLen,
+                        descMinLen > 0 ? `Description must be at least ${descMinLen} characters.` : undefined
+                    );
                 } else if (descTextArea) {
                     descTextArea.setValueState("None");
                     descTextArea.setValueStateText("");
                 }
-                // If type is number or integer, value must be <= maxlength
-                if ((attrData.type === "number") && oValueInput && attrData.value && attrData.maxlength) {
-                    if (parseFloat(attrData.value) > parseFloat(attrData.maxlength)) {
+
+                // Min/max logic for min/max fields (should be non-negative and min <= max)
+                const minInput = this.byId("attributeMinLength");
+                const maxInput = this.byId("attributeMaxLength");
+                let minVal = attrData.minlength !== undefined && attrData.minlength !== null && attrData.minlength !== "" ? parseFloat(attrData.minlength) : undefined;
+                let maxVal = attrData.maxlength !== undefined && attrData.maxlength !== null && attrData.maxlength !== "" ? parseFloat(attrData.maxlength) : undefined;
+                let minError = false, maxError = false;
+                if (minVal !== undefined && minVal < 0) {
+                    bValid = false;
+                    minError = true;
+                    if (minInput) {
+                        minInput.setValueState("Error");
+                        minInput.setValueStateText("Minimum value cannot be negative.");
+                    }
+                } else if (minInput) {
+                    minInput.setValueState("None");
+                    minInput.setValueStateText("");
+                }
+                if (maxVal !== undefined && maxVal < 0) {
+                    bValid = false;
+                    maxError = true;
+                    if (maxInput) {
+                        maxInput.setValueState("Error");
+                        maxInput.setValueStateText("Maximum value cannot be negative.");
+                    }
+                } else if (maxInput) {
+                    maxInput.setValueState("None");
+                    maxInput.setValueStateText("");
+                }
+                if (!minError && !maxError && minVal !== undefined && maxVal !== undefined && minVal > maxVal) {
+                    bValid = false;
+                    if (minInput) {
+                        minInput.setValueState("Error");
+                        minInput.setValueStateText("Minimum value cannot be greater than maximum value.");
+                    }
+                    if (maxInput) {
+                        maxInput.setValueState("Error");
+                        maxInput.setValueStateText("Maximum value cannot be less than minimum value.");
+                    }
+                }
+                // If type is number, value must be >= min and <= max
+                if ((attrData.type === "number") && oValueInput && attrData.value) {
+                    const min = attrData.minlength !== undefined && attrData.minlength !== null && attrData.minlength !== "" ? parseFloat(attrData.minlength) : undefined;
+                    const max = attrData.maxlength !== undefined && attrData.maxlength !== null && attrData.maxlength !== "" ? parseFloat(attrData.maxlength) : undefined;
+                    const val = parseFloat(attrData.value);
+                    if (max !== undefined && val > max) {
                         bValid = false;
                         oValueInput.setValueState("Error");
                         oValueInput.setValueStateText("Value must be less than or equal to Max Length.");
+                    } else if (min !== undefined && val < min) {
+                        bValid = false;
+                        oValueInput.setValueState("Error");
+                        oValueInput.setValueStateText("Value must be greater than or equal to Min Length.");
                     } else {
                         oValueInput.setValueState("None");
                         oValueInput.setValueStateText("");
                     }
                 }
-                    // Max length validation for string type
-                    if ((attrData.type === "string") && oValueInput && attrData.value && attrData.maxlength) {
-                        if (attrData.value.length > parseInt(attrData.maxlength)) {
-                            bValid = false;
-                            oValueInput.setValueState("Error");
-                            oValueInput.setValueStateText("String length must be less than or equal to Max Length.");
-                        } else {
-                            oValueInput.setValueState("None");
-                            oValueInput.setValueStateText("");
-                        }
+                // Min/max length validation for string type
+                if ((attrData.type === "string") && oValueInput && attrData.value) {
+                    const min = attrData.minlength !== undefined && attrData.minlength !== null && attrData.minlength !== "" ? parseInt(attrData.minlength) : undefined;
+                    const max = attrData.maxlength !== undefined && attrData.maxlength !== null && attrData.maxlength !== "" ? parseInt(attrData.maxlength) : undefined;
+                    if (max !== undefined && attrData.value.length > max) {
+                        bValid = false;
+                        oValueInput.setValueState("Error");
+                        oValueInput.setValueStateText("String length must be less than or equal to Max Length.");
+                    } else if (min !== undefined && attrData.value.length < min) {
+                        bValid = false;
+                        oValueInput.setValueState("Error");
+                        oValueInput.setValueStateText("String length must be greater than or equal to Min Length.");
+                    } else {
+                        oValueInput.setValueState("None");
+                        oValueInput.setValueStateText("");
                     }
+                }
 
                 // Combo values table validation (if exists)
-                const comboValues = attrData.combovalues && attrData.combovalues.results;
+                const comboValues = (attrData.combovalues && attrData.combovalues.results) || [];
                 if (Array.isArray(comboValues)) {
+                    // Prevent saving if more than 100 rows
+                    if (comboValues.length > 100) {
+                        MessageBox.error("You cannot have more than 100 Combo Values.");
+                        return;
+                    }
                     var oTable = this.byId("valuesGridTable");
                     if (oTable && oTable.getRows) {
                         var aRows = oTable.getRows();
@@ -224,11 +318,11 @@ sap.ui.define([
                                 }
                             }
                         });
-                            // If type is 'select', table must have at least one record
-                            if (attrData.type === "select" && comboValues.length === 0) {
-                                bValid = false;
-                                MessageBox.error("At least one combo value is required for type 'select'.");
-                            }
+                        // If type is 'select', table must have at least one record
+                        if (attrData.type === "select" && comboValues.length === 0) {
+                            bValid = false;
+                            MessageBox.error("At least one Select value is required for type 'select'.");
+                        }
                     }
                 }
 
@@ -353,9 +447,10 @@ sap.ui.define([
 
                 debugger
 
-                //Creating a new attribute.
+                //Creating a new attribute 
                 if (oModel.ID === undefined) {
                     var oListBinding = oODataModel.bindList("/Attributes", undefined, undefined, undefined, undefined);
+                    oODataModel.resetChanges("$auto",true);
                     this.oContext = oListBinding.create(payload, {
                         bSkipRefresh: true
                     });
@@ -364,11 +459,23 @@ sap.ui.define([
                         var aMessages = that.getModel("message").getData();
                         var oErrorMessage = aMessages.slice().reverse().find((message) => message.type === 'Error');
                         if (oErrorMessage) {
-                            oErrorMessage && MessageBox.error(oErrorMessage.message);
+                            debugger
+                            let backendMsg = '';
+                            try {
+                                backendMsg = oErrorMessage.message;
+                            } catch (e) {
+                                backendMsg = "An unexpected error occurred.";
+                            }
+                            if (backendMsg && backendMsg.toLowerCase().startsWith('unique constraint violated')) {
+                                MessageBox.error('Enter Unique Attribute name');
+                            } else {
+                                MessageBox.error(`Error: ${backendMsg}`);
+                            }
                             that._refreshMessageManager();
                             oView.setBusy(false);
                             return;
                         } else {
+                            debugger
                             var oBindingContext = that.getModel().bindContext(`/Attributes`, undefined, undefined, undefined, undefined);
                             oBindingContext.requestObject().then((aContexts) => {
                                 console.log(aContexts);
@@ -395,7 +502,8 @@ sap.ui.define([
                     // }, function (oError) {
                     //     MessageBox.error("Due to an error, attributes have not been saved.");
                     // });
-                } else {
+                } 
+                else {
                     //Updating the attribute.
                     this._refreshMessageManager();
                     this.getModel("oDataV2").update("/Attributes(guid'" + oModel.ID + "')", payload, {
@@ -411,7 +519,17 @@ sap.ui.define([
                             oView.setBusy(false);
                         },
                         error: function (oError) {
-                            MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
+                            let backendMsg = '';
+                            try {
+                                backendMsg = JSON.parse(oError.responseText).error.message.value;
+                            } catch (e) {
+                                backendMsg = oError.message;
+                            }
+                            if (backendMsg && backendMsg.toLowerCase().startsWith('unique constraint violated')) {
+                                MessageBox.error('Enter Unique Attribute name');
+                            } else {
+                                MessageBox.error(`${oError.message}: ${oError.statusCode} ${backendMsg}`);
+                            }
                             oView.setBusy(false);
                         }
                     });

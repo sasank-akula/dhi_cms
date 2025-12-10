@@ -6,15 +6,12 @@
 		noDataText="No Attribute Groups Found"
 		title="{i18n>Create_Template_SelectAttributeGroup}"
 		search=".onSearch"
+		liveChange=".onSearch"
 		confirm=".onDialogClose"
 		cancel=".onDialogClose"
 		items="{
-        path: 'appModel>/FilteredAttributeGroups',
-        filters: [{
-            path: 'Rank',
-            operator: 'EQ',
-            value1: 0
-        }]
+        path: 'appModel>/FilteredAttributeGroups'
+        
     }"
 		multiSelect="true"
 		contentHeight="70%">
@@ -22,3 +19,10 @@
 			title="{appModel>name}"/>
 	</SelectDialog>
 </core:FragmentDefinition>
+
+
+<!-- filters: [{
+            path: 'Rank',
+            operator: 'EQ',
+            value1: 0
+        }] -->

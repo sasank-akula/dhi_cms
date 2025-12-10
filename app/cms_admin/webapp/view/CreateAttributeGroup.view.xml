@@ -64,7 +64,7 @@
                                 </HBox>
                                 <OverflowToolbar />
                                 <HBox renderType="Bare" class="sapUiLargeMargin">
-                                    <Table id="tblAssociatedAttributes" mode="SingleSelectMaster" growing="true" growingThreshold="10" items="{
+                                    <Table id="tblAssociatedAttributes"  mode="SingleSelectMaster" growing="true" growingThreshold="10" items="{
         path: 'appModel>/AssociatedAttributes',
         filters: [{
             path: 'Rank',

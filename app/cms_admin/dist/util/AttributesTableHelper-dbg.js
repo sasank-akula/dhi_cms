@@ -107,24 +107,27 @@ sap.ui.define([
         columns.push({
             label: 'ID',
             property: 'attribute_id',
-            type: EdmType.String
+            type: EdmType.String,
+            defaultSelected: true
         });
         columns.push({
             label: 'Attribute Name',
             property: 'name',
-            type: EdmType.String
+            type: EdmType.String,
+            defaultSelected: true
         });
         columns.push({
             label: 'Description',
             property: 'desc',
-            type: EdmType.String
+            type: EdmType.String,
+            defaultSelected: true
         });
         columns.push({
             label: 'Attribute Type',
             property: 'type',
-            type: EdmType.String
+            type: EdmType.String,
+            defaultSelected: true
         });
-        
         return columns;
     }
 

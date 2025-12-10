@@ -2,9 +2,13 @@ sap.ui.define([
     "./BaseController",
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
-    "com/dhi/cms/cmsrequester/util/transaction/ContractHandler",
-    "com/dhi/cms/cmsrequester/util/transaction/ContractManager"
-], (BaseController, Controller, MessageBox, ContractHandler, ContractManager) => {
+    "sap/m/MessageToast",
+    "com/dhi/cms/cmsrequester/util/transaction/ContractManager",
+    "sap/ui/core/Messaging",
+    "sap/ui/core/message/Message",
+    "sap/ui/core/message/MessageType",
+    "sap/ui/core/BusyIndicator"
+], (BaseController, Controller, MessageBox, MessageToast, ContractManager, Messaging, Message, MessageType, BusyIndicator) => {
     "use strict";
 
     return BaseController.extend("com.dhi.cms.cmsrequester.controller.ContractDetails", {
@@ -13,6 +17,8 @@ sap.ui.define([
 
         },
         _onObjectMatched: function (oEvent) {
+            BusyIndicator.show(0);
+
             this._SelectedContractType;
             const oArgs = oEvent.getParameter("arguments");
             this.contractId = oArgs.contractId;
@@ -30,10 +36,16 @@ sap.ui.define([
 
             this._focusOnBasicInfoTab();
             // this._loadTenantData();
+
+            const oView = this.getView();
+            // set message model
+            oView.setModel(Messaging.getMessageModel(), "message");
+
+            Messaging.removeAllMessages();
+            BusyIndicator.hide();
+
         },
-        getRouter: function () {
-            return this.getOwnerComponent().getRouter();
-        },
+
         _initializeContractMasters: function () {
             const data = {
                 "ID": null,
@@ -61,6 +73,8 @@ sap.ui.define([
             })
             this.contractData = oDetail;
             this.getModel("contractModel").setData(oDetail);
+            this.getModel("appModel").setProperty("/status", oDetail.status);
+
         },
         _initializeViewState: function (oEvent, isEditMode, sRouteName) {
             this.getModel("appModel").setProperty("/isEditMode", isEditMode);
@@ -135,6 +149,7 @@ sap.ui.define([
                 MessageBox.warning("Please select the Contract Type")
                 return false;
             }
+
             if (sSelectedKey != "BasicInfo") {
                 if (this._SelectedContractType
                     != sSelectedContractType) {
@@ -151,6 +166,8 @@ sap.ui.define([
             }
         },
         initializeDetails: function () {
+            this.getBusyDialog().open();
+            this.getBusyDialog().setText("...loading Basic Information.");
             const oODataModel = this.getOwnerComponent().getModel(); // your OData V4 model (must be set in Component)
             let sSelectedTemplate = this.byId("contractTypeSelect").getSelectedKey();
             const that = this;
@@ -209,11 +226,11 @@ sap.ui.define([
                     // normalize attribute row to a shape your factory expects
                     const attr = {
                         Attribute_ID: row.Attribute_ID,
-                        Attribute_Name: row.Attribute_Name ,
+                        Attribute_Name: row.Attribute_Name,
                         AttributeOrder: row.AttributeOrder || 0,
                         IsMandatory: !!row.Is_Required,
                         AttributeType: row.AttributeType || "String",
-                        AttributeTypeAssociation: row.AttributeTypeAssociat || [],
+                        AttributeTypeAssociation: row.AttributeTypeAssociatin || [],
                         Value: attributeValue,
                         IsPortalEnabled: typeof row.IsPortalEnabled !== "undefined" ? row.IsPortalEnabled : null,
                         Portal_ID: row.Portal_ID || null
@@ -231,6 +248,7 @@ sap.ui.define([
                 const modelData = { AttributeGroups: grouped };
                 that.getOwnerComponent().getModel("Details").setData(modelData);
                 console.log(that.getOwnerComponent().getModel("Details").getData())
+                that.getBusyDialog().close();
 
                 return modelData; // optional: allow caller to chain
             }).catch(function (err) {
@@ -297,61 +315,91 @@ sap.ui.define([
             // Default -> just return the value as string
             return String(sValue);
         },
-        onUploadCompleted: function (oEvent) {
+        onUploadCompleted: async function (oEvent) {
             let vItem = oEvent.getParameters().item;
-            let Attachments = this.getOwnerComponent().getModel("contractModel").getProperty("/attachments");
-            // Normalize to array
+            let Attachments = this.getModel("contractModel").getProperty("/attachments") || [];
             let aItems = Array.isArray(vItem) ? vItem : [vItem];
+            let that = this;
 
-            // Extract mapped properties for each uploaded file
-            aItems.map(function (oItem) {
-                Attachments.push({
-                    fileName: oItem.getFileName(),
-                    mediaType: oItem.getMediaType ? oItem.getMediaType() : oItem.mProperties.mediaType,
-                    fileSize: oItem.getFileSize ? oItem.getFileSize() : oItem.mProperties.fileSize,
-                    uploadState: oItem.getUploadState ? oItem.getUploadState() : oItem.mProperties.uploadState,
-                    uploadedOn:
-                        (oItem.getUploadedOn && oItem.getUploadedOn()) ||
-                        oItem.mProperties.uploadedOn ||
-                        null
+            // Wait for all files to be processed
+            const newFiles = await Promise.all(
+                aItems.map(async function (oItem) {
+                    return await that._getfiledata(oItem);
                 })
-            });
+            );
+
+            // Push new files into existing list
+            Attachments.push(...newFiles);
+
+            // Update the model AFTER async work is complete
+            this.getModel("contractModel").setProperty("/attachments", Attachments);
 
             console.log("Mapped upload results:", Attachments);
-            this.getOwnerComponent().getModel("contractModel").setProperty("/attachments", Attachments)
-            // inspect in browser dev tools
         },
-        handleSaveContractBasicInfo: async function () {
-
-            const contractMasterData = this.getModel("contractModel").getData();
-            contractMasterData.attachments = [];
-            contractMasterData.attribute_values = [];
-            contractMasterData.status = "Draft";
-            let oResponse = await this.ODataPost("/Contracts", contractMasterData)
-            if (oResponse) {
-                this.getModel("contractModel").setData(oResponse);
-            }
-
+        onBeforeUploadStarts:function(oEvent){
+            debugger
         },
-        handleSaveasDraftContractDetails: async function () {
+        // handleSaveContractBasicInfo: async function () {
+        //     const contractMasterData = this.getModel("contractModel").getData();
+        //     contractMasterData.attachments = [];
+        //     contractMasterData.attribute_values = [];
+        //     contractMasterData.status = "Draft";
+        //     let oResponse = await this.ODataPost("/Contracts", contractMasterData)
+        //     if (oResponse) {
+        //         this.getModel("contractModel").setData(oResponse);
+        //     }
+
+        // },
+        handleSaveandSubmitContractDetails: async function (sSaveType) {
             const contractMasterData = this.getModel("contractModel").getData();
-            if (!this.contractId) {
-                contractMasterData.attribute_values = this.convertModelDataToAttributeValues();
+            contractMasterData.attribute_values = this.convertModelDataToAttributeValues();
+            if (sSaveType === "save") {
                 contractMasterData.status = "Draft";
-                let oContext = await this.ODataPost("/Contracts", contractMasterData);
-                oContext.created().then(() => {
-                    try {
-                        let oData = oContext.getObject(); // entity from backend
-                        console.log("New entity created:", oData);
-                        this.onNavigation('Contracts')
-                    } catch (err) {
-                        reject(err);
+            }
+            else {
+                contractMasterData.status = "Submitted";
+            }
+            let that = this;
+            if (!this.contractId) {
+
+                try {
+
+                    const sId = await this.ODataPost("/Contracts", contractMasterData);
+                    if (sId) {
+                        MessageToast.show("Contract Submitted Successfully.");
+                        this.getRouter().navTo("Contracts");
                     }
-                }).catch((err) => {
+
+                } catch (err) {
                     console.error("Create failed:", err);
-                    reject(err);
+                    MessageToast.show("Contract creation failed");
+                }
+            }
+            else {
+                console.log(this.getAppModulePathBaseURL());
+                $.ajax({
+                    url: "/contracts/Contracts('" + this.contractId + "')",
+                    method: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(contractMasterData),
+                    success: function (data) {
+                        console.log(data)
+                        MessageBox.success("Contract Submitted Successfully.", {
+                            actions: [MessageBox.Action.OK],
+                            onClose: function (oAction) {
+                                if (oAction === MessageBox.Action.OK) {
+                                    that.getRouter().navTo("Contracts");
+                                }
+                            }
+                        });
+
+                    },
+                    error: function (error) {
+                        MessageToast.show("Error submitting data");
+                    }
                 });
             }
+
 
         },
         convertModelDataToAttributeValues: function () {

@@ -45,8 +45,8 @@
                                 <IconTabFilter key="ContractPrev" text="Contract Preview" visible="{= ${appModel>/isProductPreviewVisible} &amp;&amp; (${appModel>/userRole} === 'admin' || ${appModel>/userRole} === 'catManager')}">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSubmitContract" />
-                                        <Button text="Save as Draft" type="Emphasized" icon="sap-icon://notes" press="handleSaveasDraftContractDetails" />
+                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSaveandSubmitContractDetails('submit')" />
+                                        <Button text="Save as Draft" type="Emphasized" icon="sap-icon://notes" press="handleSaveandSubmitContractDetails('save')" />
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
 
                                     </OverflowToolbar>

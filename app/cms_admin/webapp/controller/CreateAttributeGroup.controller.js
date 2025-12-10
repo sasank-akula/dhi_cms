@@ -37,7 +37,7 @@ sap.ui.define([
                     this._fnReadExistingAttributeGroup(attributeGroupId);
                     //  this._fnReadAttributes();
                 } else {
-                    this._fnReadAttributes();
+                    // this._fnReadAttributes();
                     // Initialize new arrays for CRUD
                     this.getModel("appModel").setProperty("/AttributeGroup", []);
                     this.getModel("appModel").setProperty("/AssociatedAttributes", []);
@@ -107,41 +107,29 @@ sap.ui.define([
 
 
             _fnReadAttributes: function () {
-                var that = this;
                 debugger
-                // Read data from the "oDataV2" model
-                this.getModel("oDataV2").read("/Attributes", {
-                    success: function (oData, oResponse) {
-                        // Get the array of results
-                        var newAttributes = oData.results;
-
-                        // Get the current AssociatedAttributes
-                        var currentAttributes = that.getModel("appModel").getProperty("/AssociatedAttributes") || [];
-
-                        // Create a map of current attributes by name for quick lookup
-                        const currentAttributesMap = new Map(currentAttributes.map(attr => [attr.name, attr]));
-
-                        // Iterate over each new attribute
-                        newAttributes.forEach(function (attr) {
-                            // If the attribute is not in the current attributes, set Rank to 0
-                            if (!currentAttributesMap.has(attr.name)) {
-                                attr.Rank = 0;
-                            }
-                        });
-
-                        // Merge newAttributes into AssociatedAttributes, filtering out duplicates
-                        var mergedAttributes = that.mergeAttributes(currentAttributes, newAttributes);
-
-                        // Log the modified results for debugging
-                        console.log("Merged Attributes:", mergedAttributes);
-
-                        // Set the modified data to the "appModel"
-                        that.getModel("appModel").setProperty("/AssociatedAttributes", mergedAttributes);
-                    },
-                    error: function (oError) {
-                        // Handle error (Optional: add error handling logic here)
-                        console.error("Error reading Attributes:", oError);
-                    }
+                var that = this;
+                return new Promise(function (resolve, reject) {
+                    that.getModel("oDataV2").read("/Attributes", {
+                        success: function (oData, oResponse) {
+                            var newAttributes = oData.results;
+                            var currentAttributes = that.getModel("appModel").getProperty("/AssociatedAttributes") || [];
+                            const currentAttributesMap = new Map(currentAttributes.map(attr => [attr.name, attr]));
+                            newAttributes.forEach(function (attr) {
+                                if (!currentAttributesMap.has(attr.name)) {
+                                    attr.Rank = 0;
+                                }
+                            });
+                            var mergedAttributes = that.mergeAttributes(currentAttributes, newAttributes);
+                            console.log("Merged Attributes:", mergedAttributes);
+                            that.getModel("appModel").setProperty("/AssociatedAttributes", mergedAttributes);
+                            resolve(mergedAttributes);
+                        },
+                        error: function (oError) {
+                            console.error("Error reading Attributes:", oError);
+                            reject(oError);
+                        }
+                    });
                 });
             },
 
@@ -248,6 +236,7 @@ sap.ui.define([
 
                 if (oModel.ID === undefined) {
                     var oView = this.getView();
+                    this.getModel().resetChanges("$auto",true);
                     var oListBinding = this.getModel().bindList("/Attribute_Groups", undefined, undefined, undefined, undefined);
                     this.oContext = oListBinding.create(payload, {
                         bSkipRefresh: true
@@ -257,7 +246,17 @@ sap.ui.define([
                         var aMessages = that.getModel("message").getData();
                         var oErrorMessage = aMessages.slice().reverse().find((message) => message.type === 'Error');
                         if (oErrorMessage) {
-                            oErrorMessage && MessageBox.error(oErrorMessage.message);
+                            let backendMsg = '';
+                            try {
+                                backendMsg = oErrorMessage.message;
+                            } catch (e) {
+                                backendMsg = "An unexpected error occurred.";
+                            }
+                            if (backendMsg && backendMsg.toLowerCase().startsWith('unique constraint violated')) {
+                                MessageBox.error('Enter Unique Attribute Group name');
+                            } else {
+                                MessageBox.error(`Error: ${backendMsg}`);
+                            }
                             that._refreshMessageManager();
                             oView.setBusy(false);
                             return;
@@ -316,7 +315,17 @@ sap.ui.define([
                                     oView.setBusy(false);
                                 },
                                 error: function (oError) {
-                                    MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
+                                    let backendMsg = '';
+                                    try {
+                                        backendMsg = JSON.parse(oError.responseText).error.message.value;
+                                    } catch (e) {
+                                        backendMsg = oError.message || "An unexpected error occurred.";
+                                    }
+                                    if (backendMsg && backendMsg.toLowerCase().startsWith('unique constraint violated')) {
+                                        MessageBox.error('Enter Unique Attribute Group name');
+                                    } else {
+                                        MessageBox.error(`Error: ${backendMsg}`);
+                                    }
                                     oView.setBusy(false);
                                 }
                             });
@@ -337,39 +346,38 @@ sap.ui.define([
             },
 
             onAddAttributes: function () {
-                
-                debugger
                 var that = this;
                 var oView = this.getView();
-
-                if (!this._pDialog) {
-                    this._pDialog = Fragment.load({
-                        id: oView.getId(),
-                        name: "com.dhi.cms.cmsadmin.fragments.attributegroups.AddAttributes",
-                        controller: this
-                    }).then(function (oDialog) {
-                        oView.addDependent(oDialog);
-                        return oDialog;
-                    });
-                }
-
-                // Initialize the rank counter based on existing attributes
                 var oAppModel = this.getModel("appModel");
                 var aAssociatedAttributes = oAppModel.getProperty("/AssociatedAttributes") || [];
-                this._iRankCounter = aAssociatedAttributes.length ? Math.max(...aAssociatedAttributes.map(attr => attr.Rank)) + 1 : 1;
-                console.log("Rank counter initialized to:", this._iRankCounter);
-
-                // Scenario 4 Update - Check if AssociatedAttributes has sortID property
-                var hasSortID = aAssociatedAttributes.some(attr => attr.sortID !== undefined);
-
-                if (hasSortID) {
-                    // Call _fnReadAttributes to fetch all attributes
-                    that._fnReadAttributes();
-                }
-
-                this._pDialog.then(function (oDialog) {
-                    oDialog.clearSelection();
-                    oDialog.open();
+                oView.setBusyIndicatorDelay(0);
+                oView.setBusy(true);
+                this.getModel("oDataV2").read("/Attributes", {
+                    success: function (oData) {
+                        var allAttributes = oData.results;
+                        var associatedNames = new Set(aAssociatedAttributes.map(attr => attr.name));
+                        var availableAttributes = allAttributes.filter(attr => !associatedNames.has(attr.name));
+                        oAppModel.setProperty("/AvailableAttributes", availableAttributes);
+                        that._iRankCounter = aAssociatedAttributes.length ? Math.max(...aAssociatedAttributes.map(attr => attr.Rank)) + 1 : 1;
+                        if (!that._pDialog) {
+                            that._pDialog = Fragment.load({
+                                id: oView.getId(),
+                                name: "com.dhi.cms.cmsadmin.fragments.attributegroups.AddAttributes",
+                                controller: that
+                            }).then(function (oDialog) {
+                                oView.addDependent(oDialog);
+                                return oDialog;
+                            });
+                        }
+                        that._pDialog.then(function (oDialog) {
+                            oDialog.clearSelection();
+                            oDialog.open();
+                            oView.setBusy(false);
+                        });
+                    },
+                    error: function () {
+                        oView.setBusy(false);
+                    }
                 });
             },
 
@@ -397,71 +405,24 @@ sap.ui.define([
             // },
 
             onDeleteAttribute: function (oEvent) {
-                // Get the button that triggered the event
                 var oButton = oEvent.getSource();
-
-                // Get the context binding path of the button's parent item
                 var sPath = oButton.getBindingContext("appModel").getPath();
-                console.log("Modifying item at path:", sPath);
-
-                // Get the app model
                 var oModel = this.getModel("appModel");
-
-                // Get the data array
                 var aData = oModel.getProperty("/AssociatedAttributes");
-                console.log("Current data:", aData);
-
-                // Find the index of the item to be modified
                 var iIndex = parseInt(sPath.split("/").pop(), 10);
-                console.log("Index to modify:", iIndex);
 
-                // Scenario 2 for update - Check if there is a sortID and set Rank to 0
-                if (aData[iIndex].sortID !== undefined) {
-                    // Remove the item if it has sortID
-                    aData.splice(iIndex, 1);
-                } else {
-                    // Change the Rank property to 0 for the selected item
-                    aData[iIndex].Rank = 0;
-                }
+                // Always remove the item from the array
+                aData.splice(iIndex, 1);
 
-                console.log("Data after setting rank to 0 or removing:", aData);
-
-                // Filter out the items with Rank > 0
-                var aRankedData = aData.filter(function (item) {
-                    return item.Rank > 0;
-                });
-
-                // Reassign the ranks and sortIDs starting from 1
-                aRankedData.forEach(function (item, index) {
+                // Reassign the ranks and sortIDs starting from 1 for remaining items
+                aData.forEach(function (item, index) {
                     item.Rank = index + 1;
                     if (item.sortID !== undefined) {
                         item.sortID = index + 1;
                     }
                 });
 
-                // Merge the ranked data back with the original data
-                aData.forEach(function (item) {
-                    if (item.Rank === 0) {
-                        var existingItem = aRankedData.find(rankedItem => rankedItem.ID === item.ID);
-                        if (!existingItem) {
-                            aRankedData.push(item);
-                        }
-                    }
-                });
-
-                // Update the model with the modified array
-                oModel.setProperty("/AssociatedAttributes", aRankedData);
-
-                console.log("Data after re-ranking:", aRankedData);
-
-                // Update the title with the new count
-                var oTitle = this.byId("attributesTitle");
-                var iNewCount = aRankedData.filter(function (item) {
-                    return item.Rank > 0;
-                }).length;
-                oTitle.setText("Attributes (" + iNewCount + ")");
-
-                // Refresh the model to reflect changes
+                oModel.setProperty("/AssociatedAttributes", aData);
                 oModel.refresh();
             },
 
@@ -538,8 +499,8 @@ sap.ui.define([
 
                     // Update the count in the Title text dynamically
                     var oTable = this.byId("tblAssociatedAttributes");
-                    var oTitle = oTable.getHeaderToolbar().getContent()[0]; // Assuming Title is the first element in OverflowToolbar
-                    oTitle.setText("Attributes (" + aRankedAttributesCount + ")");
+                    // var oTitle = oTable.getHeaderToolbar().getContent()[0]; // Assuming Title is the first element in OverflowToolbar
+                    // oTitle.setText("Attributes (" + aRankedAttributesCount + ")");
                 } else {
                     MessageToast.show(oBundle.getText("attributeGroupNoNewItemSelected"));
                 }

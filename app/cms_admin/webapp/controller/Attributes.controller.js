@@ -114,6 +114,9 @@ sap.ui.define([
                         return oDeferred.promise();
                     }
                 };
+                if (this.oTablePersoController) {
+                    this.oTablePersoController.destroy();
+                }
                 this.oTablePersoController = new TablePersoController({
                     table: this.byId("tblAttributes"),
                     persoService: oPersoService

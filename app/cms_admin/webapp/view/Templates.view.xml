@@ -14,7 +14,7 @@
                         <Title text="{= ${i18n>Templates_Title} + ' (' + ${appModel>/TemplateCount} + ')' }" titleStyle="H3"/>
                         <ToolbarSpacer/>
                         <Button id="createTemplates" text="{i18n>Templates_CreateButton}" icon="sap-icon://add-document" press="onNavigation('Create Template')" type="Emphasized"/>
-                        <Button id="clearFilters" enabled="true" visible="true" text="{i18n>Templates_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Templates_ClearFiltersTooltip}"/>
+                        <Button id="clearFilters" enabled="true" visible="true" text="{i18n>Templates_ClearFilters}" icon="sap-icon://clear-filter" press="clearAllFilters" tooltip="{i18n>Templates_ClearFiltersTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Templates_TablePersonalizationTooltip}" />
                         <Button id="exportTemplates" press="handler.onExportData" icon="sap-icon://excel-attachment" enabled="{= ${appModel>/TemplateCount} > 0 }"
  tooltip="{i18n>Templates_ExportTableTooltip}" />

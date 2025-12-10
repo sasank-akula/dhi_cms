@@ -103,9 +103,9 @@
 
                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'select'}">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="associationsSelect"/>
-                                        <ComboBox id="associationsSelect" width="100%" items="{appModel>/Attributes/combovalues/results}" selectedKey="{appModel>/Attributes/value}" value="{appModel>/Attributes/value}">
+                                        <Select id="associationsSelect" width="100%" items="{appModel>/Attributes/combovalues/results}" selectedKey="{appModel>/Attributes/value}">
                                             <core:Item key="{appModel>value}" text="{appModel>value}" />
-                                        </ComboBox>
+                                        </Select>
                                     </VBox>
                                     <VBox class="sapUiMediumMarginBottom" visible="{= ${appModel>/Attributes/type} === 'boolean'}">
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="booleanSelect"/>
@@ -127,7 +127,7 @@
                                         </VBox>
                                         <VBox>
                                             <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Maximum_Length}" labelFor="attributeMaxLength"/>
-                                            <Input maxLength="3" id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/maxlength}" editable="{= ['boolean','select','date'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
+                                            <Input maxLength="3"  id="attributeMaxLength" placeholder="{i18n>Create_Attribute_Maximum_Length_Placeholder}" type="Number" value="{appModel>/Attributes/maxlength}" editable="{= ['boolean','select','date'].indexOf(${appModel>/Attributes/type}) === -1 }"/>
                                         </VBox>
                                     </HBox>
                                 </VBox>
@@ -151,7 +151,7 @@
                         </f:GridList>
 
                         <HBox width="100%" renderType="Bare" justifyContent="Center" alignItems="Center" alignContent="Center" visible="{= ${appModel>/Attributes/type} === 'select'}">
-                            <table:Table class="sapUiSmallMargin" id="valuesGridTable" rows="{appModel>/Attributes/combovalues/results}" selectionMode="None" visibleRowCount="5" width="70%" showNoData="true" columnHeaderHeight="40">
+                            <table:Table class="sapUiSmallMargin" id="valuesGridTable" rows="{appModel>/Attributes/combovalues/results}" selectionMode="None" visibleRowCount="5" visibleRowCountMode="Auto" width="100%" showNoData="true" columnHeaderHeight="40">
 
                                 <table:extension>
                                     <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">

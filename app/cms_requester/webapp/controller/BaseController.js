@@ -6,16 +6,8 @@ sap.ui.define([
 ], function (Controller, Link, Fragment, MessageBox) {
     "use strict";
 
-    return Controller.extend("com.pimx.prodsphere.pxm.controller.BaseController", {
+    return Controller.extend("com.dhi.cms.cmsrequester.controller.BaseController", {
 
-        /**
-         * Convenience method for accessing the controrls
-         * @param {string} sId - ID of the Control
-         * @returns sap.ui.core.Control
-         */
-        // byId: function(sId) {
-        //     return this.getView().byId(sId);
-        // },
 
         /**
          * Convenience method for accessing the router in every controller of the application.
@@ -74,100 +66,6 @@ sap.ui.define([
                 console.error("Navigation target not defined.");
             }
         },
-
-        onRulesNavigation: function () {
-            window.open("https://development-aarini.cockpit.workflowmanagement.cfapps.eu10.hana.ondemand.com/comsapbpmrule.ruleeditor/index.html#/Projects");
-        },
-
-        /**
-         * Updates the breadcrumbs based on the current navigation
-         * @private
-         * @param {string} sNavigationTarget the navigation target
-         */
-        _updateBreadcrumbs: function (sNavigationTarget) {
-            var sComponentId = this.getOwnerComponent().getId();
-            var oBreadcrumbs = Fragment.byId(this._getFragmentId(sComponentId, "App", "ToolPageHeader"), "breadcrumbs");
-            if (!oBreadcrumbs) {
-                console.error("Breadcrumbs control not found.");
-                return;
-            }
-            var that = this;
-            var i18nModel = this.getView().getModel("i18n");
-            var i18nBundle = i18nModel ? i18nModel.getResourceBundle() : null;
-            if (!i18nBundle) {
-                console.error("i18n resource bundle not found.");
-                return;
-            }
-            var aMainSections = ["Dashboard", "Products", "Attributes", "Attribute Groups", "Templates", "Catalogue"];
-            var oSubPageMapping = {
-                "Create Products": "Products",
-                "Create Attributes": "Attributes",
-                "Create Attribute Group": "Attribute Groups",
-                "Create Template": "Templates",
-                "Create Catalogue": "Catalogue"
-            };
-            var getTranslatedText = function (key) {
-                return i18nBundle.getText("Breadcrumbs_" + key.replace(/\s/g, "_"), key);
-            };
-            var aNewBreadcrumbs = [];
-            var sLastBreadcrumbText = "";
-            // Check if editing an existing item using appModel
-            var isEditMode = this.getModel("appModel").getProperty("/isEditMode");
-            // First breadcrumb (Prodsphere)
-            aNewBreadcrumbs.push(new Link({
-                text: "Prodsphere",
-                press: function () {
-                    that.getRouter().navTo("Dashboard");
-                }
-            }));
-            if (sNavigationTarget === "Dashboard") {
-                sLastBreadcrumbText = getTranslatedText("Dashboard");
-            } else {
-                var sMainSection = aMainSections.find(section => sNavigationTarget.includes(section));
-                var sParentSection = oSubPageMapping[sNavigationTarget];
-                // Avoid duplicate breadcrumbs for main sections
-                if (sParentSection) {
-                    aNewBreadcrumbs.push(new Link({
-                        text: getTranslatedText(sParentSection),
-                        press: function () {
-                            that.getRouter().navTo(sParentSection);
-                        }
-                    }));
-                } else if (sMainSection && sMainSection !== sNavigationTarget) {
-                    aNewBreadcrumbs.push(new Link({
-                        text: getTranslatedText(sMainSection),
-                        press: function () {
-                            that.getRouter().navTo(sMainSection);
-                        }
-                    }));
-                }
-                // Set last breadcrumb text based on edit mode
-                if (isEditMode) {
-                    if (sNavigationTarget === "Create Products") {
-                        sLastBreadcrumbText = getTranslatedText("Update Product");
-                    } else if (sNavigationTarget === "Create Attributes") {
-                        sLastBreadcrumbText = getTranslatedText("Update Attribute");
-                    } else if (sNavigationTarget === "Create Attribute Group") {
-                        sLastBreadcrumbText = getTranslatedText("Update Attribute Group");
-                    } else if (sNavigationTarget === "Create Template") {
-                        sLastBreadcrumbText = getTranslatedText("Update Template");
-                    } else if (sNavigationTarget === "Create Catalogue") {
-                        sLastBreadcrumbText = getTranslatedText("Update Catalogue");
-                    } else {
-                        sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
-                    }
-                } else {
-                    sLastBreadcrumbText = getTranslatedText(sNavigationTarget);
-                }
-            }
-            // Remove existing breadcrumbs and add new ones except last one
-            oBreadcrumbs.removeAllLinks();
-            aNewBreadcrumbs.forEach(oLink => oBreadcrumbs.addLink(oLink));
-            oBreadcrumbs.setCurrentLocationText(sLastBreadcrumbText);
-            // Reset edit mode flag after setting breadcrumbs
-            this.getModel("appModel").setProperty("/isEditMode", false);
-        },
-
         confirmAction: function (sMessage, actions) {
             let promise = new Promise((resolve, reject) => {
                 let defaultactions = [MessageBox.Action.YES, MessageBox.Action.NO];
@@ -187,35 +85,10 @@ sap.ui.define([
             });
             return promise;
         },
-
-        /**
-       * Register message manager specific to the view
-       * @private 
-       * @memberof com.pimx.prodsphere.pxm
-       */
-        _fnRegisterMessageManager: function () {
-            sap.ui
-                .getCore()
-                .getMessageManager()
-                .registerObject(this.getView(), true);
-            var oMessagesModel = sap.ui
-                .getCore()
-                .getMessageManager()
-                .getMessageModel();
-            this.getView().setModel(oMessagesModel, "message");
-        },
-
-        _refreshMessageManager: function () {
-            sap.ui.getCore().getMessageManager().getMessageModel().setData([]);
-            sap.ui.getCore().getMessageManager().getMessageModel().refresh();
-            this.getModel("message").setData([]);
-            this.getModel("message").refresh();
-        },
-
         getBusyDialog: function () {
             if (!this._oBusyDialog) {
                 this._oBusyDialog = sap.ui.xmlfragment(this.getView().getController().createId("busyDialogId"),
-                    "com.pimx.prodsphere.pxm.fragments.BusyDialog",
+                    "com.dhi.cms.cmsrequester.fragments.BusyDialog",
                     this);
                 this.getView().addDependent(this._oBusyDialog);
             }
@@ -240,15 +113,69 @@ sap.ui.define([
             let oBundle = this.getResourceBundle();
             return oBundle.getText(sTextId, aArgs);
         },
-         ODataPost: function (sPath, oNewData) {
+        ODataPost: function (sPath, oNewData) {
             return new Promise((resolve, reject) => {
                 let oModel = this.getView().getModel();
                 let oDataBinding = oModel.bindList(sPath);
                 let oContext = oDataBinding.create(oNewData);
 
-                return oContext;
+                oContext.created().then(() => {
+                    try {
+                        let oData = oContext.getObject(); // entity from backend
+                        console.log("New entity created:", oData);
+
+                        if (oData && oData.ID) {
+                            console.log("New ID:", oData);
+                            resolve(oData.ID); // ✅ return ID
+                        } else {
+                            reject("No ID returned from backend");
+                        }
+                    } catch (err) {
+                        reject(err);
+                    }
+                }).catch((err) => {
+                    console.error("Create failed:", err);
+                    reject(err);
+                });
             });
-        }
+        },
+        _getfiledata: async function (item) {
+            let fileItem = {};
+            fileItem.file_name = item.getFileName();
+            // fileItem.file_size = item._oFileObject.size;
+            let fileString = await this.getBase64(item._oFileObject);
+            fileItem.media_type = this.getFileType(fileString.split(",")[0]);
+            // fileItem.file_content = fileString.split(",")[1];
+            return fileItem;
+        },
+        getBase64: function (file) {
+            return new Promise((resolve, reject) => {
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    resolve(reader.result);
+                };
+            });
+        },
+
+        /**
+         * Delete the file
+         * @namespace com.dhi.cms.cmsrequester.util.transaction.AttachmentsHandler
+         * @param {sap.ui.model.v4.Context} context Context to be deleted
+         * @returns Promise<void>
+         */
+        deleteFile: function (context) {
+            return context.delete();
+        },
+        getFileType: function (fileType) {
+            const regex = /data:([^;]+);base64/;
+            const match = fileType.match(regex);
+            if (match) {
+                return match[1];
+            } else {
+                return 'unknown';
+            }
+        },
 
     });
 

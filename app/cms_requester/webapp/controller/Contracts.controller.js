@@ -10,8 +10,9 @@ sap.ui.define([
     'sap/ui/model/FilterType',
     "sap/ui/core/Fragment",
     'sap/ui/export/Spreadsheet',
-    'sap/ui/export/library'
-], (BaseController, Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet, exportLibrary) => {
+    'sap/ui/export/library',
+    "sap/ui/core/BusyIndicator"
+], (BaseController, Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet, exportLibrary,BusyIndicator) => {
     "use strict";
     var EdmType = exportLibrary.EdmType;
     return BaseController.extend("com.dhi.cms.cmsrequester.controller.Contracts", {
@@ -19,8 +20,10 @@ sap.ui.define([
             this.getRouter().getRoute("Contracts").attachPatternMatched(this._onObjectMatched, this);
 
         },
-        getRouter: function () {
-            return this.getOwnerComponent().getRouter();
+         _onObjectMatched: function (oEvent) {
+            this._refreshTable();
+            this._setPersonalization();
+            this.clearAllFilters();
         },
         onGoBtnPress: function (oEvent) {
             let oFilterbar = this.byId("idFilterBar")
@@ -58,20 +61,6 @@ sap.ui.define([
             this.byId("tblContracts").getBinding("rows").filter([]);
             MessageToast.show("Filters cleared Sucessfully.")
         },
-        onCreateContract: function (sNavigationTarget) {
-            var oRouter = this.getOwnerComponent().getRouter();
-            var sNavigationTarget;
-            if (sNavigationTarget) {
-                oRouter.navTo(sNavigationTarget);
-            } else {
-                console.error("Navigation target not defined.");
-            }
-        },
-        _onObjectMatched: function (oEvent) {
-            this._refreshTable();
-            this._setPersonalization();
-            this.clearAllFilters();
-        },
         onExportData: function (event) {
             let table = this.byId("tblContracts");
             let binding = table.getBinding('rows');
@@ -83,7 +72,7 @@ sap.ui.define([
                 },
                 dataSource: binding,
                 fileName: 'Contracts.xlsx',
-                worker: false // We need to disable worker because we are using a MockServer as OData Service
+                worker: false 
             };
 
             let sheet = new Spreadsheet(settings);
@@ -138,30 +127,6 @@ sap.ui.define([
             });
 
             return columns;
-        },
-
-
-        onProductDelete: function (event) {
-            let oBundle = this.getResourceBundle();
-            let productHandler = ProductManager.getInstance();
-            let context = event.getSource().getBindingContext();
-            let { ID, name } = context.getObject();
-            MessageBox.warning(oBundle.getText("confirmDeleteProduct", [name]), {
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                emphasizedAction: MessageBox.Action.YES,
-                initialFocus: MessageBox.Action.NO,
-                onClose: (sAction) => {
-                    if (sAction === MessageBox.Action.YES) {
-                        productHandler.deleteProduct(ID).then(() => {
-                            this._refreshTable();
-                            MessageBox.success(oBundle.getText("productDeleted", [name]));
-                        }).catch((err) => {
-                            MessageBox.error(oBundle.getText("productDeleteError", [name]));
-                        });
-                    }
-                },
-                dependentOn: this.getView()
-            });
         },
         _refreshTable: function () {
             this.byId("tblContracts").getBinding("rows").refresh();
@@ -271,7 +236,16 @@ sap.ui.define([
 
         onRowsUpdated: function () {
             var oTable = this.byId("tblContracts");
-            this.getModel("appModel").setProperty("/ProductCount", oTable.getBinding("rows").getLength());
+            this.getModel("appModel").setProperty("/ContractCount", oTable.getBinding("rows").getLength());
+        },
+        onCreateContract: function (sNavigationTarget) {
+            var sNavigationTarget;
+            if (sNavigationTarget) {
+                this.getRouter().navTo(sNavigationTarget);
+            } else {
+                console.error("Navigation target not defined.");
+            }
+
         },
         onDeleteContract: function (oEvent) {
             const oView = this.getView();

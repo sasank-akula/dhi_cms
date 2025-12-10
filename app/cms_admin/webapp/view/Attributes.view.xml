@@ -9,19 +9,19 @@
     xmlns:rowmodes="sap.ui.table.rowmodes">
     <Page id="AttributesPage" showHeader="false">
         <content>
-            <table:Table id="tblAttributes" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Attributes', sorter: { path: 'name', descending: false }, parameters: { $$updateGroupId : 'Attributes' }}" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributesTableHelper" }' rowsUpdated="onRowsUpdated">
+            <table:Table id="tblAttributes" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Attributes', sorter: { path: 'name', descending: false }, parameters: { $$updateGroupId : 'Attributes' }}" enableColumnFreeze="true" enableCellFilter="true"  core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributesTableHelper" }' rowsUpdated="onRowsUpdated">
                 <table:extension>
                     <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">
                         <Title text="{= ${i18n>Attributes_Title} + ' (' + ${appModel>/AttributeCount} + ')' }" titleStyle="H3"/>
                         <ToolbarSpacer/>
                         <Button id="createAttributes" text="{i18n>Attributes_Create}" icon="sap-icon://add-document" press="onNavigation('Create Attributes')" type="Emphasized"/>
-                        <Button id="clearFilters" enabled="false" visible="true" text="{i18n>Attributes_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attributes_ClearFiltersTooltip}"/>
+                        <Button id="clearFilters" enabled="true" visible="true" text="{i18n>Attributes_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attributes_ClearFiltersTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Attributes_PersonalizationTooltip}" />
                         <Button id="exportProducts" press="handler.onExportData" icon="sap-icon://excel-attachment" enabled="{= ${appModel>/AttributeCount} > 0 }" tooltip="{i18n>Attributes_ExportTooltip}" />
                     </OverflowToolbar>
                 </table:extension>
                 <table:columns>
-                    <table:Column id="attibuteId" filterProperty="ID" sortProperty="ID" resizable="true" autoResizable="true" headerMenu="menu">
+                    <table:Column id="attibuteId" defaultFilterOperator="EQ" filterProperty="ID" sortProperty="ID" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attributes_ID}" wrapping="true"/>
                         <table:template>
                             <Text text="{ID}" wrapping="false" textAlign="Left" width="100%"/>

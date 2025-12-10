@@ -312,21 +312,46 @@ sap.ui.define([
             //Validation check
             onSave: async function () {
                 var bValid = true;
-                var templateName = this.byId("templateNameInput").getValue();
-                var templateDesc = this.byId("templateDescInput").getValue();
+                var oNameInput = this.byId("templateNameInput");
+                var oDescInput = this.byId("templateDescInput");
+                var templateName = oNameInput.getValue();
+                var templateDesc = oDescInput.getValue();
 
-                if (templateName === "") {
-                    this.byId("templateNameInput").setValueState("Error");
-                    this.byId("templateNameInput").setValueStateText("This field is required.");
+                // Template Name: required, max from XML
+                const nameMaxLen = oNameInput.getMaxLength ? oNameInput.getMaxLength() : 50;
+                if (!templateName || templateName.trim() === "") {
+                    oNameInput.setValueState("Error");
+                    oNameInput.setValueStateText("This field is required.");
+                    bValid = false;
+                } else if (templateName.length > nameMaxLen) {
+                    oNameInput.setValueState("Error");
+                    oNameInput.setValueStateText(`Name must be less than ${nameMaxLen} characters.`);
                     bValid = false;
                 } else {
-                    this.byId("templateNameInput").setValueState("None");
+                    oNameInput.setValueState("None");
+                }
+
+                // Description: max from XML
+                const descMaxLen = oDescInput.getMaxLength ? oDescInput.getMaxLength() : 100;
+                if (templateDesc && templateDesc.length > descMaxLen) {
+                    oDescInput.setValueState("Error");
+                    oDescInput.setValueStateText(`Description must be less than ${descMaxLen} characters.`);
+                    bValid = false;
+                } else {
+                    oDescInput.setValueState("None");
                 }
                 if (bValid === true) {
+                    var oView = this.getView();
+                    oView.setBusyIndicatorDelay(0);
+                    oView.setBusy(true);
+                    try {
+                        await this.handleSaveTemplate();
+                    } catch (err) {
+                        console.error("Save failed:", err);
+                         oView.setBusy(false);
+                    }
                     this.byId("templateNameInput").setValueState("None");
                     this.byId("templateDescInput").setValueState("None");
-                    await this.handleSaveTemplate();
-
                 }
             },
 
@@ -372,8 +397,15 @@ sap.ui.define([
                     }
                 }
 
+                if(payload.attribute_groups.length === 0){
+                    MessageBox.error(oBundle.getText("templateNoAttributeGroupError"));
+                    
+                    throw new Error("No attribute groups associated with the template.");
+                }
+
                 // Creating a new template
                 if (oModel.ID === undefined) {
+                    var oView = this.getView();
                     var oListBinding = this.getModel().bindList("/Templates", undefined, undefined, undefined, undefined);
                     this.getModel().resetChanges();
                     this.oContext = oListBinding.create(payload, {
@@ -386,6 +418,7 @@ sap.ui.define([
                         if (oErrorMessage) {
                             oErrorMessage && MessageBox.error(oErrorMessage.message);
                             that._refreshMessageManager();
+                            oView.setBusy(false);
                             return;
                         } else {
                             var sNewGroupPath = that.oContext.getPath();
@@ -404,13 +437,14 @@ sap.ui.define([
                                     }
                                 }
                             });
+                            oView.setBusy(false);
                         }
                     });
                 } else {
                     // Updating an existing template
+                    var oView = this.getView();
                     this.getModel("oDataV2").read("/Templates(" + oModel.ID + ")?$expand=attribute_groups($select=ID,sortID)", {
                         success: function (oData) {
-
                             // Proceed with the update using the prepared payload directly
                             that.getModel("oDataV2").update("/Templates(" + oModel.ID + ")?$expand=attribute_groups($select=ID,sortID)", payload, {
                                 success: function (oData, oResponse) {
@@ -422,26 +456,25 @@ sap.ui.define([
                                             }
                                         }
                                     });
+                                    oView.setBusy(false);
                                 },
                                 error: function (oError) {
                                     MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
+                                    oView.setBusy(false);
                                 }
                             });
                         },
                         error: function (oError) {
-                            MessageBox.error(oBundle.getText("failedToReadTemplates"));
+                            MessageBox.error(oBundle.getText("templateReadError"));
+                            oView.setBusy(false);
                         }
                     });
                 }
             },
-
-            // Add the helper method to get that ID generated 
             extractIdFromPath: function (sPath) {
                 var match = sPath.match(/\(([^)]+)\)/);
                 return match ? match[1] : null;
             },
-
-
             onDialogClose: function (oEvent) {
                 debugger
                 let oBundle = this.getResourceBundle();
@@ -512,8 +545,7 @@ sap.ui.define([
                 // Re-apply TreeTable binding after model update
                 //this.templateRankLogic();
             },
-
-            onDeleteAttributeGroup: function (oEvent) {
+             onDeleteAttributeGroup: function (oEvent) {
                 // Get the button that triggered the event
                 var oButton = oEvent.getSource();
 
@@ -573,10 +605,7 @@ sap.ui.define([
 
                 // Refresh the model to reflect changes
                 oModel.refresh();
-            },
-
-
-
+            }
 
         });
     });

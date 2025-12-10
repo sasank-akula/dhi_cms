@@ -99,6 +99,9 @@ sap.ui.define([
                     dependentOn: this.getView(),
                     onClose: (sAction) => {
                         if (sAction === "YES") {
+                            var oTable = this.byId("tblAttributeGroups");
+                            oTable.setBusyIndicatorDelay(0);
+                            oTable.setBusy(true);
                             let attributeContext = contextBinding.getBoundContext();
                             attributeContext.requestObject().then((data) => {
                                 console.log(data);
@@ -106,9 +109,11 @@ sap.ui.define([
                                     let sSuccessMessage = oBundle.getText("attributeGroupDeleteSuccessMessage", [attributeGroupName]);
                                     MessageToast.show(sSuccessMessage);
                                     that._getAttributeGrpList();
+                                    oTable.setBusy(false);
                                 }).catch(function (oError) {
                                     let sErrorMessage = oBundle.getText("attributeGroupDeleteErrorMessage", [attributeGroupName]);
                                     MessageBox.error(sErrorMessage);
+                                    oTable.setBusy(false);
                                 });
                             });
                         }
@@ -126,7 +131,6 @@ sap.ui.define([
             },
 
             onClearFilters: function () {
-                this.byId("clearFilters").setEnabled(false);
                 this.clearAllFilters();
             },
 
@@ -147,8 +151,6 @@ sap.ui.define([
                 var oBinding = oTable.getBinding("rows");
 
                 if (sQuery) {
-                    this.byId("clearFilters").setEnabled(true);
-
                     // Get all columns from the table
                     var aColumns = oTable.getColumns();
                     var aFilters = [];
@@ -179,8 +181,6 @@ sap.ui.define([
                     oEvent.preventDefault();
 
                 } else {
-                    this.byId("clearFilters").setEnabled(false);
-
                     // Clear all filters
                     oBinding.filter([], sap.ui.model.FilterType.Application);
                 }

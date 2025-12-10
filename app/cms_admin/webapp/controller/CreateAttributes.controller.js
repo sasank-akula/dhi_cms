@@ -1,4 +1,3 @@
-
 sap.ui.define([
     "./BaseController",
     "sap/m/MessageToast",
@@ -12,6 +11,31 @@ sap.ui.define([
 
         return BaseController.extend("com.dhi.cms.cmsadmin.controller.CreateAttributes", {
             formatter: formatter,
+            onCancel: function () {
+                // Reset main input value states
+                ["attributeNameInput", "AttributeTypeSelect", "aliasNameAttrInput", "descriptionInput", "associationsSelect", "attributeTypeInput"].forEach(function(id) {
+                    var oCtrl = this.byId(id);
+                    if (oCtrl && oCtrl.setValueState) {
+                        oCtrl.setValueState("None");
+                        oCtrl.setValueStateText("");
+                    }
+                }.bind(this));
+
+                // Reset value states for all table inputs
+                var oTable = this.byId("valuesGridTable");
+                if (oTable && oTable.getRows) {
+                    var aTableRows = oTable.getRows();
+                    aTableRows.forEach(function(oRow) {
+                        var oInput = oRow && oRow.getAggregation && oRow.getAggregation("cells")[0];
+                        if (oInput && oInput.setValueState) {
+                            oInput.setValueState("None");
+                            oInput.setValueStateText("");
+                        }
+                    });
+                }
+                // Now navigate after reset
+                this.onNavigation("Attributes");
+            },
 
             onInit: function () {
                 this.getRouter().getRoute("Create Attributes").attachPatternMatched(this._onObjectMatched, this);
@@ -29,6 +53,19 @@ sap.ui.define([
                 aRows.splice(iIndex, 1);
 
                 oModel.setProperty("/Attributes/combovalues/results", aRows);
+
+                // Reset value states for all table inputs
+                var oTable = this.byId("valuesGridTable");
+                if (oTable && oTable.getRows) {
+                    var aTableRows = oTable.getRows();
+                    aTableRows.forEach(function(oRow) {
+                        var oInput = oRow && oRow.getAggregation && oRow.getAggregation("cells")[0];
+                        if (oInput && oInput.setValueState) {
+                            oInput.setValueState("None");
+                            oInput.setValueStateText("");
+                        }
+                    });
+                }
             },
             onAddRow: function () {
                 const oModel = this.getView().getModel("appModel");
@@ -97,48 +134,111 @@ sap.ui.define([
             },
 
             onSave: async function () {
+                // Centralized validation using appModel data
+                const oAppModel = this.getView().getModel("appModel");
+                const attrData = oAppModel.getProperty("/Attributes");
                 let bValid = true;
-debugger
+                // Input controls
                 const oNameInput = this.byId("attributeNameInput");
                 const oTypeSelect = this.byId("AttributeTypeSelect");
                 const oAliasInput = this.byId("aliasNameAttrInput");
+                const oDescInput = this.byId("descriptionInput");
                 const oAssocSelect = this.byId("associationsSelect");
+                const oValueInput = this.byId("attributeTypeInput");
 
-                const attributeName = oNameInput.getValue();
-                const attributeType = oTypeSelect.getSelectedKey();
-                const aliasName = oAliasInput.getValue();
-                const association = oAssocSelect.getValue();
-                const associationReq = this.getView().getModel("appModel").getProperty("/Attributes/type");
-
-                // Helper
-                const validateField = (value, control) => {
-                    if (!value || value.trim() === "") {
+                // Helper for required and length
+                const validateField = (value, control, requiredMsg, maxLen, maxLenMsg) => {
+                    if (!value || value.toString().trim() === "") {
                         control.setValueState("Error");
-                        control.setValueStateText("This field is required.");
+                        control.setValueStateText(requiredMsg);
                         return false;
-                    } else {
-                        control.setValueState("None");
-                        return true;
                     }
+                    if (maxLen && value.length > maxLen) {
+                        control.setValueState("Error");
+                        control.setValueStateText(maxLenMsg);
+                        return false;
+                    }
+                    control.setValueState("None");
+                    return true;
                 };
 
-                // Validations
-                bValid &= validateField(attributeName, oNameInput);
-                bValid &= validateField(attributeType, oTypeSelect);
-                bValid &= validateField(aliasName, oAliasInput);
+                // Attribute Name: required, max from XML
+                const nameMaxLen = oNameInput.getMaxLength ? oNameInput.getMaxLength() : 50;
+                bValid &= validateField(attrData.name, oNameInput, "Attribute Name is required.", nameMaxLen, `Attribute Name must be less than ${nameMaxLen} characters.`);
+                // Attribute Type: required
+                bValid &= validateField(attrData.type, oTypeSelect, "Attribute Type is required.");
+                // Alias Name: required, max from XML
+                const aliasMaxLen = oAliasInput.getMaxLength ? oAliasInput.getMaxLength() : 50;
+                bValid &= validateField(attrData.alias, oAliasInput, "Alias Name is required.", aliasMaxLen, `Alias Name must be less than ${aliasMaxLen} characters.`);
+                // Description: max from XML
+                const descTextArea = this.byId("descriptionTextArea");
+                const descMaxLen = descTextArea && descTextArea.getMaxLength ? descTextArea.getMaxLength() : 100;
+                if (descTextArea) {
+                    bValid &= validateField(attrData.desc, descTextArea, "", descMaxLen, `Description must be less than ${descMaxLen} characters.`);
+                }
+                // If type is number or integer, value must be <= maxlength
+                if ((attrData.type === "number") && oValueInput && attrData.value && attrData.maxlength) {
+                    if (parseFloat(attrData.value) > parseFloat(attrData.maxlength)) {
+                        bValid = false;
+                        oValueInput.setValueState("Error");
+                        oValueInput.setValueStateText("Value must be less than or equal to Max Length.");
+                    } else {
+                        oValueInput.setValueState("None");
+                        oValueInput.setValueStateText("");
+                    }
+                }
+                    // Max length validation for string type
+                    if ((attrData.type === "string") && oValueInput && attrData.value && attrData.maxlength) {
+                        if (attrData.value.length > parseInt(attrData.maxlength)) {
+                            bValid = false;
+                            oValueInput.setValueState("Error");
+                            oValueInput.setValueStateText("String length must be less than or equal to Max Length.");
+                        } else {
+                            oValueInput.setValueState("None");
+                            oValueInput.setValueStateText("");
+                        }
+                    }
 
-                if (associationReq === "Association") {
-                    bValid &= validateField(association, oAssocSelect);
-                } else {
-                    oAssocSelect.setValueState("None");
+                // Combo values table validation (if exists)
+                const comboValues = attrData.combovalues && attrData.combovalues.results;
+                if (Array.isArray(comboValues)) {
+                    var oTable = this.byId("valuesGridTable");
+                    if (oTable && oTable.getRows) {
+                        var aRows = oTable.getRows();
+                        comboValues.forEach((row, idx) => {
+                            var oRow = aRows[idx];
+                            var oInput = oRow && oRow.getAggregation && oRow.getAggregation("cells")[0];
+                            if (!row.value || row.value.toString().trim() === "") {
+                                bValid = false;
+                                if (oInput && oInput.setValueState) {
+                                    oInput.setValueState("Error");
+                                    oInput.setValueStateText("Value is required.");
+                                }
+                            } else {
+                                if (oInput && oInput.setValueState) {
+                                    oInput.setValueState("None");
+                                    oInput.setValueStateText("");
+                                }
+                            }
+                        });
+                            // If type is 'select', table must have at least one record
+                            if (attrData.type === "select" && comboValues.length === 0) {
+                                bValid = false;
+                                MessageBox.error("At least one combo value is required for type 'select'.");
+                            }
+                    }
                 }
 
                 if (!bValid) return;
 
                 // Save + Navigate
+                var oView = this.getView();
+                oView.setBusyIndicatorDelay(0);
+                oView.setBusy(true);
                 try {
                     await this.handleSaveAttribute();
                 } catch (err) {
+                    oView.setBusy(false);
                     console.error("Save failed:", err);
                 }
             },
@@ -224,6 +324,7 @@ debugger
 
             handleSaveAttribute: function (oEvent) {
                 var that = this;
+                var oView = this.getView();
                 var oBundle = this.getResourceBundle();
                 var oODataModel = this.getModel();
                 var oModel = this.getModel("appModel").getData().Attributes;
@@ -262,6 +363,7 @@ debugger
                         if (oErrorMessage) {
                             oErrorMessage && MessageBox.error(oErrorMessage.message);
                             that._refreshMessageManager();
+                            oView.setBusy(false);
                             return;
                         } else {
                             var oBindingContext = that.getModel().bindContext(`/Attributes`, undefined, undefined, undefined, undefined);
@@ -280,15 +382,8 @@ debugger
                                 });
                                 that._fnReadAttributes(oContext[0].ID);
                                 that._refreshMessageManager();
+                                oView.setBusy(false);
                             })
-                            // let contextBinding = that.getModel().bindList(`/Attributes`, undefined, undefined, undefined, undefined).requestContexts().then((aContexts)  => {
-                            //     console.log(aContexts);
-                            //     var oModel = that.getModel("appModel").getData().Attributes;
-                            //     var oContext = aContexts.filter((data) => { return data.getObject().name == oModel.name});
-                            //     console.log(oContext);
-                            // });
-                            // context.requestObject("updateAttachments").then(() => {
-
                         }
                     });
                     // this.oContext.created().then(function () {
@@ -310,9 +405,11 @@ debugger
                                     }
                                 }
                             });
+                            oView.setBusy(false);
                         },
                         error: function (oError) {
                             MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
+                            oView.setBusy(false);
                         }
                     });
                 }

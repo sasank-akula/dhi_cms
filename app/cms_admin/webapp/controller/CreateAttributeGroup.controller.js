@@ -148,29 +148,61 @@ sap.ui.define([
 
             //Validation check
             onSave: async function () {
+                debugger
                 var bValid = true;
-                var attributeName = this.byId("attributeGrpNameInput").getValue();
-                var aliasName = this.byId("aliasNameInputAtrGrp").getValue();
+                var oNameInput = this.byId("attributeGrpNameInput");
+                var oAliasInput = this.byId("aliasNameInputAtrGrp");
+                var oDescInput = this.byId("attributeGrpDescInput");
 
-                if (attributeName === "") {
-                    this.byId("attributeGrpNameInput").setValueState("Error");
-                    this.byId("attributeGrpNameInput").setValueStateText("This field is required.");
+                var attributeName = oNameInput.getValue();
+                var aliasName = oAliasInput.getValue();
+                var descValue = oDescInput.getValue();
+
+                // Attribute Group Name: required, max from XML
+                const nameMaxLen = oNameInput.getMaxLength ? oNameInput.getMaxLength() : 50;
+                if (!attributeName || attributeName.trim() === "") {
+                    oNameInput.setValueState("Error");
+                    oNameInput.setValueStateText("This field is required.");
+                    bValid = false;
+                } else if (attributeName.length > nameMaxLen) {
+                    oNameInput.setValueState("Error");
+                    oNameInput.setValueStateText(`Name must be less than ${nameMaxLen} characters.`);
                     bValid = false;
                 } else {
-                    this.byId("attributeGrpNameInput").setValueState("None");
+                    oNameInput.setValueState("None");
                 }
-                // Alias name is not mandatory as per task # 3358
-                // if (aliasName === "") {
-                //     this.byId("aliasNameInputAtrGrp").setValueState("Error");
-                //     this.byId("aliasNameInputAtrGrp").setValueStateText("This field is required.");
-                //     bValid = false;
-                // } else {
-                //     this.byId("aliasNameInputAtrGrp").setValueState("None");
-                // }
+
+                // Alias Name: max from XML (not required)
+                const aliasMaxLen = oAliasInput.getMaxLength ? oAliasInput.getMaxLength() : 50;
+                if (aliasName && aliasName.length > aliasMaxLen) {
+                    oAliasInput.setValueState("Error");
+                    oAliasInput.setValueStateText(`Alias must be less than ${aliasMaxLen} characters.`);
+                    bValid = false;
+                } else {
+                    oAliasInput.setValueState("None");
+                }
+
+                // Description: max from XML
+                const descMaxLen = oDescInput.getMaxLength ? oDescInput.getMaxLength() : 100;
+                if (descValue && descValue.length > descMaxLen) {
+                    oDescInput.setValueState("Error");
+                    oDescInput.setValueStateText(`Description must be less than ${descMaxLen} characters.`);
+                    bValid = false;
+                } else {
+                    oDescInput.setValueState("None");
+                }
+                // Table must have at least one associated attribute
                 if (bValid === true) {
-                    await this.handleSaveAttributeGroup();
+                    var oView = this.getView();
+                    oView.setBusyIndicatorDelay(0);
+                    oView.setBusy(true);
+                    try {
+                        await this.handleSaveAttributeGroup();
+                    } catch (err) {
+                        console.error("Save failed:", err);
+                         oView.setBusy(false);
+                    } 
                     await this.byId("attributeGrpNameInput").setValueState("None");
-                    
                     // this.byId("aliasNameInputAtrGrp").setValueState("None");
                 }
             },
@@ -208,7 +240,14 @@ sap.ui.define([
                     }
                 }
 
+                
+                if (!Array.isArray(payload.attributes) || payload.attributes.length === 0) {
+                    MessageBox.error("Please add at least one attribute to the group.");
+                    throw new Error("No attributes to save.");
+                }
+
                 if (oModel.ID === undefined) {
+                    var oView = this.getView();
                     var oListBinding = this.getModel().bindList("/Attribute_Groups", undefined, undefined, undefined, undefined);
                     this.oContext = oListBinding.create(payload, {
                         bSkipRefresh: true
@@ -220,6 +259,7 @@ sap.ui.define([
                         if (oErrorMessage) {
                             oErrorMessage && MessageBox.error(oErrorMessage.message);
                             that._refreshMessageManager();
+                            oView.setBusy(false);
                             return;
                         } else {
                             var sNewGroupPath = that.oContext.getPath();
@@ -238,8 +278,8 @@ sap.ui.define([
                                     }
                                 }
                             });
+                            oView.setBusy(false);
                             debugger
-                           
                         }
                     });
                     // this.oContext.created().then(function () {
@@ -257,6 +297,7 @@ sap.ui.define([
                 } else {
                     // Scenario 1 for update - change name, alias or description 
                     // Fetch the existing data before updating
+                    var oView = this.getView();
                     this.getModel("oDataV2").read("/Attribute_Groups(" + oModel.ID + ")?$expand=attributes($select=ID,sortID;", {
                         success: function (oData) {
                             console.log("Existing data for Attribute Group ID:", oModel.ID, oData);
@@ -265,21 +306,24 @@ sap.ui.define([
                             that.getModel("oDataV2").update("/Attribute_Groups(" + oModel.ID + ")?$expand=attributes($select=ID,sortID)", payload, {
                                 success: function (oData, oResponse) {
                                     MessageBox.success(oBundle.getText("attributeGroupUpdateSuccess"),{
-                                actions: [MessageBox.Action.OK],
-                                onClose: function (oAction) {
-                                    if (oAction === MessageBox.Action.OK) {
-                                        that.onNavigation("Attribute Groups");
-                                    }
-                                }
-                            });
+                                        actions: [MessageBox.Action.OK],
+                                        onClose: function (oAction) {
+                                            if (oAction === MessageBox.Action.OK) {
+                                                that.onNavigation("Attribute Groups");
+                                            }
+                                        }
+                                    });
+                                    oView.setBusy(false);
                                 },
                                 error: function (oError) {
                                     MessageBox.error(`${oError.message}: ${oError.statusCode} ${JSON.parse(oError.responseText).error.message.value}`);
+                                    oView.setBusy(false);
                                 }
                             });
                         },
                         error: function (oError) {
                             MessageBox.error(oBundle.getText("attributeGroupReadError"));
+                            oView.setBusy(false);
                         }
                     });
                 }
@@ -305,7 +349,6 @@ sap.ui.define([
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
-                        
                         return oDialog;
                     });
                 }

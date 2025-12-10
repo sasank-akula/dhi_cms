@@ -9,10 +9,6 @@
             "value": "Number"
         },
         {
-            "type": "integer",
-            "value": "Integer"
-        },
-        {
             "type": "boolean",
             "value": "Boolean"
         },

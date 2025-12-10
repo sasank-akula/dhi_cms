@@ -14,7 +14,7 @@
                         <Title text="{i18n>Attribute_Group_Title} ({appModel>/AttributeGroupCount})" titleStyle="H3"/>
                         <ToolbarSpacer/>
                         <Button id="createAttributes" text="{i18n>Attribute_Group_Create}" icon="sap-icon://add-document" press="onNavigation('Create Attribute Group')" type="Emphasized"/>
-                        <Button id="clearFilters" enabled="false" visible="true" text="{i18n>Attribute_Group_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attribute_Group_ClearFiltersTooltip}"/>
+                        <Button id="clearFilters" enabled="true" visible="true" text="{i18n>Attribute_Group_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Attribute_Group_ClearFiltersTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Attribute_Group_PersonalizationTooltip}" />
                         <Button id="exportProducts" press="handler.onExportData" enabled="{= ${appModel>/AttributeGroupCount} > 0 }"
  icon="sap-icon://excel-attachment" tooltip="{i18n>Attribute_Group_ExportTooltip}" />

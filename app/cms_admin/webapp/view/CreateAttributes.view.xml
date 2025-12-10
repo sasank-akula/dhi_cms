@@ -21,7 +21,7 @@
                             <ToolbarSeparator class="sapUiSmallMarginEnd"/>
                             <!-- <Button id="btnDoneAttribute" class="sapUiTinyMarginEnd" type="Neutral" text="{i18n>Create_Attribute_Done}" icon="sap-icon://complete" press="onNavigation('Attributes')"/> -->
                             <Button id="btnSaveAttribute" text="{i18n>Create_Attribute_Save}" type="Emphasized" icon="sap-icon://save" press="onSave" />
-                            <Button id="btnCancelAttribute" class="sapUiSmallMarginEnd" text="{i18n>Create_Attribute_Cancel}" icon="sap-icon://decline" press="onNavigation('Attributes')"/>
+                            <Button id="btnCancelAttribute" class="sapUiSmallMarginEnd" text="{i18n>Create_Attribute_Cancel}" icon="sap-icon://decline" press=".onCancel"/>
                         </OverflowToolbar>
                         <f:GridList class="sapUiMediumMarginTop sapUiMediumMarginBegin" width="96%">
                             <!-- <f:customLayout>
@@ -94,7 +94,7 @@
 
                                         <Label class="sapUiTinyMarginBottom" text="{i18n>Create_Attribute_Value}" labelFor="attributeTypeDate"/>
 
-                                        <DatePicker id="attributeTypeDate" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" placeholder="{i18n>Create_Attribute_Value_Placeholder}" value="{
+                                        <DatePicker id="attributeTypeDate" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" placeholder="{i18n>Create_Attribute_Value_Placeholder_Date}" value="{
                     path: 'appModel>/Attributes/value',
                     formatter: 'formatter.toDate'
                 }" />

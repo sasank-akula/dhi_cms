@@ -31,13 +31,18 @@ sap.ui.define([
                     dependentOn: this.getView(),
                     onClose: (sAction) => {
                         if (sAction === "YES") {
+                            var oTable = this.byId("tblAttributes");
+                            oTable.setBusyIndicatorDelay(0);
+                            oTable.setBusy(true);
                             oEvent.getSource().getBindingContext().delete("$auto").then(function () {
                                 let sSuccessMessage = oBundle.getText("attributeDeleteSuccessMessage", [attributeName]);
                                 MessageToast.show(sSuccessMessage);
                                 this._refreshTable();
+                                oTable.setBusy(false);
                             }.bind(this), function (oError) {
                                 let sErrorMessage = oBundle.getText("attributeDeleteErrorMessage", [attributeName]);
                                 MessageBox.error(sErrorMessage);
+                                oTable.setBusy(false);
                             });
                         }
                     }
@@ -69,7 +74,6 @@ sap.ui.define([
             },
 
             onClearFilters: function () {
-                this.byId("clearFilters").setEnabled(false);
                 this.clearAllFilters();
             },
 
@@ -82,51 +86,6 @@ sap.ui.define([
                     oTable.filter(aColumns[i], null);
                 }
                 this.byId("tblAttributes").getBinding("rows").filter(oFilter, "Application");
-            },
-
-            onTableFilter: function (oEvent) {
-                var sQuery = oEvent.getParameter("value");
-                var oTable = this.byId("tblAttributes");
-                var oBinding = oTable.getBinding("rows");
-
-                if (sQuery) {
-                    this.byId("clearFilters").setEnabled(true);
-
-                    // Get all columns from the table
-                    var aColumns = oTable.getColumns();
-                    var aFilters = [];
-
-                    // Iterate through each column to create filters
-                    aColumns.forEach(function (oColumn) {
-                        var sFilterProperty = oColumn.getFilterProperty();
-                        if (sFilterProperty) {
-                            // Create a filter for each column
-                            var oFilter = new Filter({
-                                path: sFilterProperty,
-                                operator: sap.ui.model.FilterOperator.Contains,
-                                value1: sQuery,
-                                caseSensitive: false
-                            });
-                            aFilters.push(oFilter);
-                        }
-                    });
-
-                    // Combine filters with OR condition
-                    var oCombinedFilter = new sap.ui.model.Filter({
-                        filters: aFilters,
-                        and: false
-                    });
-
-                    // Apply the combined filter to the binding
-                    oBinding.filter(oCombinedFilter, sap.ui.model.FilterType.Application);
-                    oEvent.preventDefault();
-
-                } else {
-                    this.byId("clearFilters").setEnabled(false);
-
-                    // Clear all filters
-                    oBinding.filter([], sap.ui.model.FilterType.Application);
-                }
             },
              _setPersonalization: function () {
                 var oBundle, oDeferred, oPersoService = {

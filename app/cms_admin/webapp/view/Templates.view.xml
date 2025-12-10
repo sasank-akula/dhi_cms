@@ -8,13 +8,13 @@
     xmlns:rowmodes="sap.ui.table.rowmodes" controllerName="com.dhi.cms.cmsadmin.controller.Templates">
     <Page id="TemplatesPage" showHeader="false">
         <content>
-            <table:Table id="tblTemplates" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Templates', sorter: { path: 'ID', descending: true }}" enableColumnFreeze="true" enableCellFilter="true" filter="onTableFilter" core:require='{ handler : "com/dhi/cms/cmsadmin/util/TemplatesTableHelper" }' rowsUpdated="onRowsUpdated">
+            <table:Table id="tblTemplates" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Templates', sorter: { path: 'ID', descending: true }}" enableColumnFreeze="true" enableCellFilter="true"  core:require='{ handler : "com/dhi/cms/cmsadmin/util/TemplatesTableHelper" }' rowsUpdated="onRowsUpdated">
                 <table:extension>
                     <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">
                         <Title text="{= ${i18n>Templates_Title} + ' (' + ${appModel>/TemplateCount} + ')' }" titleStyle="H3"/>
                         <ToolbarSpacer/>
                         <Button id="createTemplates" text="{i18n>Templates_CreateButton}" icon="sap-icon://add-document" press="onNavigation('Create Template')" type="Emphasized"/>
-                        <Button id="clearFilters" enabled="false" visible="true" text="{i18n>Templates_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Templates_ClearFiltersTooltip}"/>
+                        <Button id="clearFilters" enabled="true" visible="true" text="{i18n>Templates_ClearFilters}" icon="sap-icon://clear-filter" press="onClearFilters" tooltip="{i18n>Templates_ClearFiltersTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="onPersonalization" tooltip="{i18n>Templates_TablePersonalizationTooltip}" />
                         <Button id="exportTemplates" press="handler.onExportData" icon="sap-icon://excel-attachment" enabled="{= ${appModel>/TemplateCount} > 0 }"
  tooltip="{i18n>Templates_ExportTableTooltip}" />
@@ -24,7 +24,7 @@
                     <table:Column id="templateId" filterProperty="ID" sortProperty="ID" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Templates_ColumnID}" wrapping="true"/>
                         <table:template>
-                            <Text text="{ID}" wrapping="false" textAlign="Left" width="100%"/>
+                            <Text text="{ID}" defaultFilterOperator="EQ" wrapping="false" textAlign="Left" width="100%"/>
                         </table:template>
                     </table:Column>
                     <table:Column id="templateName" filterProperty="name" sortProperty="name" resizable="true" autoResizable="true" headerMenu="menu">

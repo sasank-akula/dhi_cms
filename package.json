@@ -51,6 +51,11 @@
           }
         }
       }
+    },
+     "server": {
+      "body_parser": {
+        "limit": "50mb"
+      }
     }
   },
   "workspaces": [

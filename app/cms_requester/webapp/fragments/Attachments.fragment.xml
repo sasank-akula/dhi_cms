@@ -72,7 +72,7 @@
                             <Link text="{contractModel>file_name}" press="openPreview" class="sapUiTinyMarginBottom"/>
                             <Text text="{contractModel>file_size} KB" />
                             <Text text="{contractModel>media_type}" />
-                            <Text text="{contractModel>uploadedOn}" visible="{= %{contractModel>/ID}? true:false}"/>
+                            <Text text="{contractModel>modifiedAt}" visible="{= %{contractModel>/ID}? true:false}"/>
                             <Button class="sapUiTinyMarginBegin" type="Transparent" icon="sap-icon://decline" press="onRemoveFiles" />
                         </cells>
                     </ColumnListItem>

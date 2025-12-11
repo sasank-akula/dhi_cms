@@ -5,11 +5,13 @@ sap.ui.define([
     "sap/ui/table/TablePersoController",
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
-    'sap/ui/model/FilterType'
-], (BaseController, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType) => {
+    'sap/ui/model/FilterType',
+     "../model/formatter"
+], (BaseController, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, formatter) => {
     "use strict";
 
     return BaseController.extend("com.dhi.cms.cmsadmin.controller.Attributes", {
+         formatter: formatter,
          onInit: function () {
                 this.getRouter().getRoute("Attributes").attachPatternMatched(this._onObjectMatched, this);
             },

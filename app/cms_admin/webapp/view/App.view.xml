@@ -5,10 +5,11 @@
   xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
   xmlns="sap.m">a
    <tnt:ToolPage id="mainPage" contentBackgroundDesign="Solid"   sideExpanded="false">
-    <!-- <tnt:header>
+    <tnt:header>
       <tnt:ToolHeader id="_IDGenToolHeader">
+        <Title text="{i18n>App_ToolHeader_Title}" level="H1"/>
       </tnt:ToolHeader>
-    </tnt:header> -->
+    </tnt:header>
     <tnt:sideContent>
       <core:Fragment fragmentName="com.dhi.cms.cmsadmin.fragments.SideNavigation" type="XML" />
     </tnt:sideContent>

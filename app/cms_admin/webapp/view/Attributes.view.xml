@@ -9,7 +9,9 @@
     xmlns:rowmodes="sap.ui.table.rowmodes">
     <Page id="AttributesPage" showHeader="false">
         <content>
-            <table:Table id="tblAttributes" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Attributes', sorter: { path: 'name', descending: false }, parameters: { $$updateGroupId : 'Attributes' }}" enableColumnFreeze="true" enableCellFilter="true"  core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributesTableHelper" }' rowsUpdated="onRowsUpdated">
+            <table:Table id="tblAttributes" class="sapUiSmallMargin" selectionMode="None" visibleRowCountMode="Auto" rows="{path: '/Attributes', sorter: { path: 'name', descending: false },  parameters: {
+    $select: '*'
+  }}" enableColumnFreeze="true" enableCellFilter="true"  core:require='{ handler : "com/dhi/cms/cmsadmin/util/AttributesTableHelper" }' rowsUpdated="onRowsUpdated">
                 <table:extension>
                     <OverflowToolbar design="Transparent" class="sapUiSmallMargin overflowToolbarBorder">
                         <Title text="{= ${i18n>Attributes_Title} + ' (' + ${appModel>/AttributeCount} + ')' }" titleStyle="H3"/>
@@ -34,10 +36,22 @@
                             <Text text="{name}" wrapping="false"/>
                         </table:template>
                     </table:Column>
+                    <table:Column id="attributeValue" filterProperty="value" sortProperty="value" resizable="true" autoResizable="true" headerMenu="menu">
+                        <Label text="{i18n>Attributes_Value}" wrapping="true"/>
+                        <table:template>
+                            <Text text="{value}" wrapping="false"/>
+                        </table:template>
+                    </table:Column>
                     <table:Column id="attributeDesc" filterProperty="desc" sortProperty="desc" resizable="true" autoResizable="true" headerMenu="menu">
                         <Label text="{i18n>Attributes_Description}" wrapping="true"/>
                         <table:template>
                             <Text text="{desc}" wrapping="false"/>
+                        </table:template>
+                    </table:Column>
+                    <table:Column id="attributeAlias" filterProperty="alias" visible="false" sortProperty="alias" resizable="true" autoResizable="true" headerMenu="menu">
+                        <Label text="{i18n>Attributes_Alias}" wrapping="true"/>
+                        <table:template>
+                            <Text text="{alias}" wrapping="false"/>
                         </table:template>
                     </table:Column>
                     <table:Column id="attributeType" filterProperty="type" sortProperty="type" resizable="true" autoResizable="true" headerMenu="menu">
@@ -45,6 +59,25 @@
                         <table:template>
                             <Text text="{type}" wrapping="false"/>
                         </table:template>
+                    </table:Column>
+                    <table:Column id="attributeMin" defaultFilterOperator="EQ" visible="false" filterProperty="minlength" sortProperty="minlength" resizable="true" autoResizable="true" headerMenu="menu">
+                        <Label text="{i18n>Attributes_MinLength}" wrapping="true"/>
+                        <table:template>
+                            <Text text="{minlength}" wrapping="false"/>
+                        </table:template>
+                    </table:Column>
+                     <table:Column id="attributeMax" defaultFilterOperator="EQ" visible="false" filterProperty="maxlength" sortProperty="maxlength" resizable="true" autoResizable="true" headerMenu="menu">
+                        <Label text="{i18n>Attributes_MaxLength}" wrapping="true"/>
+                        <table:template>
+                            <Text text="{maxlength}" wrapping="false"/>
+                        </table:template>
+                    </table:Column>
+
+                    <table:Column id="attributeMandatory" visible="false" filterProperty="is_mandatory" sortProperty="is_mandatory" resizable="true" autoResizable="true" headerMenu="menu">
+                                <Label text="{i18n>Attributes_Mandatory}" wrapping="true"/>
+                                <table:template>
+                                    <Text text="{path: 'is_mandatory', formatter: '.formatter.booleanToString'}"/>
+                                </table:template>
                     </table:Column>
 
                     <table:Column width="90px">

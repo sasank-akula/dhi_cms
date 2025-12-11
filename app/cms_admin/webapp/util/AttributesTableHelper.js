@@ -115,13 +115,38 @@ sap.ui.define([
             type: EdmType.String
         });
         columns.push({
+            label: 'Value',
+            property: 'value',
+            type: EdmType.String
+        });
+        columns.push({
             label: 'Description',
             property: 'desc',
             type: EdmType.String
         });
         columns.push({
+            label: 'Alias Name',
+            property: 'alias',
+            type: EdmType.String
+        });
+        columns.push({
             label: 'Attribute Type',
             property: 'type',
+            type: EdmType.String
+        });
+        columns.push({
+            label: 'Min Length',
+            property: 'minlength',
+            type: EdmType.String
+        });
+        columns.push({
+            label: 'Max Length',
+            property: 'maxlength',
+            type: EdmType.String
+        });
+        columns.push({
+            label: 'Mandatory',
+            property: 'is_mandatory',
             type: EdmType.String
         });
         return columns;

@@ -2,6 +2,10 @@ sap.ui.define([], () => {
 	"use strict";
 
 	return {
+		booleanToString: function (bValue) {
+			debugger
+		    return bValue=="Yes" ? "true" : "false";
+		},
 		toDate: function (sValue) {
 			if (!sValue) return null;
 			// Converts yyyy-MM-dd → JS Date

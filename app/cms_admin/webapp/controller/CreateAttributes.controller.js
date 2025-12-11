@@ -436,13 +436,14 @@ sap.ui.define([
                     "desc": oModel.desc,
                     "alias": oModel.alias,
                     "type": oModel.type,
-                    "value": oModel.value,
+                    // For 'select' type, use the selectedKey from 'associationsSelect' (which is the ID), otherwise use the value
+                    "value": oModel.type === 'select' ? this.byId("associationsSelect").getSelectedKey() : oModel.value,
                     // "regex": oModel.regex,
                     "status": oModel.status,
                     "is_mandatory": this.byId("isMandatorySwitch").getState(),
                     "minlength": oModel.minlength,
                     "maxlength": oModel.maxlength,
-                    "combovalues": oModel.type === 'select' ? oModel.combovalues.results : [] || []
+                    "combovalues": oModel.type === 'select' ? (oModel.combovalues && oModel.combovalues.results ? oModel.combovalues.results : []) : []
                 };
 
                 debugger

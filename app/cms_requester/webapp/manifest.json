@@ -92,7 +92,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/details.json"
       },
+      
       "appModel": {
+                "type": "sap.ui.model.json.JSONModel"
+            },
+            "ComboBoxModel": {
                 "type": "sap.ui.model.json.JSONModel"
             }
     },

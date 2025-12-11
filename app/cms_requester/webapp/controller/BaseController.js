@@ -145,7 +145,7 @@ sap.ui.define([
             // fileItem.file_size = item._oFileObject.size;
             let fileString = await this.getBase64(item._oFileObject);
             fileItem.media_type = this.getFileType(fileString.split(",")[0]);
-            // fileItem.file_content = fileString.split(",")[1];
+            fileItem.file_content = fileString.split(",")[1];
             return fileItem;
         },
         getBase64: function (file) {
@@ -176,6 +176,17 @@ sap.ui.define([
                 return 'unknown';
             }
         },
+        _getCombovalues: async function (Attribute_ID) {
+            let oModel = this.getModel();
+            let sPath = "/Attributes('" + Attribute_ID + "')";
+            let oContext = oModel.bindContext(sPath, undefined, { $expand: "combovalues" });
+            let oDetail = await oContext.requestObject().then(function (oData) {
+                console.log(oData);
+                return oData;
+            })
+            return oDetail
+
+        }
 
     });
 

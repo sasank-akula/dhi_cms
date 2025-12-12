@@ -51,16 +51,6 @@
                 <Panel headerText="{Details>Attribute_Group_Name}" expandable="false" width="100%" class="attributeGroupPanel">
                   <VBox width="100%">
 
-                    <!-- Render group's attributes as a single-column form -->
-                    <f:SimpleForm
-                      layout="ResponsiveGridLayout"
-                      editable="false"
-                      width="100%"
-                      class="attributeGroupForm"
-                      labelSpanL="4" labelSpanM="4" labelSpanS="12"
-                      adjustLabelSpan="true"
-                      maxContainerCols="1"
-                      columnsXL="1" columnsL="1" columnsM="1">
 
                       <!-- iterate attributes using a nested List bound to Attributes -->
                       <List items="{Details>Attributes}" width="100%" showSeparators="None">
@@ -82,8 +72,6 @@
                           </CustomListItem>
                         </items>
                       </List>
-
-                    </f:SimpleForm>
 
                   </VBox>
                 </Panel>

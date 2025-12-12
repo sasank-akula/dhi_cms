@@ -13,7 +13,9 @@
                                 <IconTabFilter key="BasicInfo" text="Basic_Information">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press=".handleSaveContractBasicInfo"/>
+                                        <!-- <Button text="Save" type="Emphasized" icon="sap-icon://save" press=".handleSaveContractBasicInfo"/> -->
+                                        <Button text="Next" type="Emphasized" icon="sap-icon://open-command-field" press=".handleNextTabpress('Details')"/>
+
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')" visible="{appModel>/isButtonVisible}"/>
 
                                     </OverflowToolbar>
@@ -22,7 +24,9 @@
                                 <IconTabFilter key="Details" text="Details">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" />
+                                        <Button text="Next" type="Emphasized" icon="sap-icon://open-command-field" press=".handleNextTabpress('Attachments')"/>
+
+                                        <!-- <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" /> -->
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
                                     </OverflowToolbar>
                                     <core:Fragment class="sapUiSmallMarginEnd" fragmentName="com.dhi.cms.cmsrequester.fragments.Details" type="XML" />
@@ -31,15 +35,18 @@
                                 <IconTabFilter key="Attachments" text="Attachments">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" />
+                                        <Button text="Next" type="Emphasized" icon="sap-icon://open-command-field" press=".handleNextTabpress('ContractPrev')"/>
+
+                                        <!-- <Button text="Save" type="Emphasized" icon="sap-icon://save" press="handleSaveContractDetails" /> -->
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
                                     </OverflowToolbar>
                                     <core:Fragment fragmentName="com.dhi.cms.cmsrequester.fragments.Attachments" type="XML" />
                                 </IconTabFilter>
-                                <IconTabFilter key="ProdPrev" text="Contract Preview" visible="{= ${appModel>/isProductPreviewVisible} &amp;&amp; (${appModel>/userRole} === 'admin' || ${appModel>/userRole} === 'catManager')}">
+                                <IconTabFilter key="ContractPrev" text="Contract Preview" visible="{= ${appModel>/isProductPreviewVisible} &amp;&amp; (${appModel>/userRole} === 'admin' || ${appModel>/userRole} === 'catManager')}">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSubmitContract" />
+                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSaveandSubmitContractDetails('submit')" />
+                                        <Button text="Save as Draft" type="Emphasized" icon="sap-icon://notes" press="handleSaveandSubmitContractDetails('save')" />
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
 
                                     </OverflowToolbar>

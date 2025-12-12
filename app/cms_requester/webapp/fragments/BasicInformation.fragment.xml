@@ -25,6 +25,7 @@
                 value="{contractModel>/name}"
                 width="500px" 
                 required="true"
+                change="onControlValueChange"
             />
 
             <Label text="Contract Number / Reference ID" visible="{= !!${contractModel>/ID} }"/>
@@ -35,6 +36,7 @@
                 editable="false"
                 width="500px"
                 visible="{= !!${contractModel>/ID} }"
+                change="onControlValueChange"
             />
 
             <Label text="Contract Type" required="true"/>
@@ -46,6 +48,7 @@
                 width="500px"
                 editable="{= !${contractModel>/ID} }"
                 required="true"
+                change="onControlValueChange"
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
@@ -56,6 +59,7 @@
                 value="{contractModel>/alias}"
                 width="500px" 
                 required="true"
+                change="onControlValueChange"
             />
             <Label text="Description" required="true"/>
             <Input 
@@ -64,30 +68,12 @@
                 value="{contractModel>/description}"
                 width="500px" 
                 required="true"
+                change="onControlValueChange"
             />
-            <Label text="Related Master Agreement"/>
-            <Input 
-                id="masterAgreementInput" 
-                placeholder="Enter reference ID" 
-                value="{contractModel>/MasterAgreementID}"
-                width="500px"
-            />
-
-            <!-- <Label text="Project / Business Unit"/>
-            <ComboBox 
-                id="businessUnitSelect" 
-                selectedKey="{contractModel>/BusinessUnitID}" 
-                items="{path: 'contractModel>/ValidBusinessUnits'}"
-                width="500px"
-            >
-                <core:Item key="{contractModel>ID}" text="{contractModel>Name}" />
-            </ComboBox> -->
             <Label text="Start Date"></Label>
-            <DatePicker                 width="500px"
-></DatePicker>
+            <DatePicker value="{contractModel>/start_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" ></DatePicker>
             <Label text="Expiry Date"></Label>
-            <DatePicker                 width="500px"
- ></DatePicker>
+            <DatePicker value="{contractModel>/end_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px"></DatePicker>
         </f:content>
     </f:SimpleForm>
 </core:FragmentDefinition>

@@ -19,7 +19,10 @@ sap.ui.define([
         _onObjectMatched: function (oEvent) {
             BusyIndicator.show(0);
             this.basicVaditionIds = ["contractTitleInput", "contractTypeSelect", "contractaliasInput", "contractdescriptionInput"];
-            this.clearValidationStates(this.basicVaditionIds)
+            this.clearValidationStates(this.basicVaditionIds);
+            if(this.getModel("Details").getProperty("/dynamicControlIds")){
+            this.clearValidationStates(this.getModel("Details").getProperty("/dynamicControlIds"));}
+            // this.getModel("Details").setData();
             this._SelectedContractType;
             const oArgs = oEvent.getParameter("arguments");
             this.contractId = oArgs.contractId;
@@ -38,11 +41,6 @@ sap.ui.define([
             this._focusOnBasicInfoTab();
             // this._loadTenantData();
 
-            const oView = this.getView();
-            // set message model
-            oView.setModel(Messaging.getMessageModel(), "message");
-
-            Messaging.removeAllMessages();
             BusyIndicator.hide();
 
         },
@@ -89,7 +87,7 @@ sap.ui.define([
 
         },
 
-        onTabSelect: function (navItemId) {
+        onTabSelect: async function (navItemId) {
             let sSelectedKey = this.byId("iconTabBar").getSelectedKey();
             if (navItemId) {
                 sSelectedKey = navItemId;
@@ -105,7 +103,10 @@ sap.ui.define([
             if (sSelectedKey != "BasicInfo") {
                 if (this._SelectedContractType
                     != sSelectedContractType) {
-                    this.initializeDetails();
+                    this.getView().setBusy(true)
+
+                    await this.initializeDetails();
+                    this.getView().setBusy(false)
                 }
             }
             if (sSelectedKey != "Details") {
@@ -131,8 +132,6 @@ sap.ui.define([
 
         },
         initializeDetails: function () {
-            this.getBusyDialog().open();
-            this.getBusyDialog().setText("...loading Basic Information.");
             const oODataModel = this.getOwnerComponent().getModel(); // your OData V4 model (must be set in Component)
             let sSelectedTemplate = this.byId("contractTypeSelect").getSelectedKey();
             const that = this;
@@ -226,7 +225,6 @@ sap.ui.define([
                 const modelData = { AttributeGroups: grouped };
                 that.getOwnerComponent().getModel("Details").setData(modelData);
                 console.log("Details", that.getOwnerComponent().getModel("Details").getData())
-                that.getBusyDialog().close();
 
                 return modelData; // optional: allow caller to chain
             }).catch(function (err) {
@@ -319,7 +317,13 @@ sap.ui.define([
         onUploadCompleted: async function (oEvent) {
             let vItem = oEvent.getParameters().item;
             let Attachments = this.getModel("contractModel").getProperty("/attachments") || [];
+
             let aItems = Array.isArray(vItem) ? vItem : [vItem];
+            let total = Attachments.length + aItems.length;
+            if (total > 5) {
+                MessageBox.warning("Attachments limit is Exceeded.");
+                return;
+            }
             let that = this;
 
             // Wait for all files to be processed
@@ -340,6 +344,57 @@ sap.ui.define([
         onBeforeUploadStarts: function (oEvent) {
             debugger
         },
+        onDeleteDocumentPress: function (oEvent) {
+            // The ColumnListItem that was deleted
+            var oListItem = oEvent.getParameter("listItem");
+            if (!oListItem) {
+                console.warn("Delete event fired without listItem");
+                return;
+            }
+
+            var oModel = this.getModel("contractModel");
+            var oContext = oListItem.getBindingContext("contractModel");
+
+            // If we have a binding context, get its path (e.g. /attachments/3)
+            if (oContext) {
+                var sPath = oContext.getPath(); // like "/attachments/3"
+                var aParts = sPath.split("/");
+                var sIndex = aParts.pop(); // "3" (index in attachments)
+
+                // Defensive: ensure attachments is an array
+                var aAttachments = oModel.getProperty("/attachments") || [];
+                var iIndex = parseInt(sIndex, 10);
+
+                if (!isNaN(iIndex) && iIndex >= 0 && iIndex < aAttachments.length) {
+                    // Optionally confirm deletion with the user
+                    sap.m.MessageBox.confirm("Are you sure you want to delete this attachment?", {
+                        onClose: function (sAction) {
+                            if (sAction === sap.m.MessageBox.Action.OK) {
+                                aAttachments.splice(iIndex, 1);
+                                oModel.setProperty("/attachments", aAttachments);
+                            } else {
+                                // user cancelled; do nothing
+                            }
+                        }
+                    });
+                } else {
+                    console.error("Invalid attachment index:", sIndex, "path:", sPath);
+                }
+            } else {
+                // fallback: no binding context — attempt to match by file name or URL
+                var sFileName = oListItem.getCells && oListItem.getCells()[0] && oListItem.getCells()[0].getText && oListItem.getCells()[0].getText();
+                var aAttachments = oModel.getProperty("/attachments") || [];
+                var i = aAttachments.findIndex(function (it) {
+                    return it.file_name === sFileName || it.file_url === sFileName; // adjust as needed
+                });
+                if (i >= 0) {
+                    aAttachments.splice(i, 1);
+                    oModel.setProperty("/attachments", aAttachments);
+                } else {
+                    console.warn("Could not find matching attachment to delete (fallback).");
+                }
+            }
+        },
         // handleSaveContractBasicInfo: async function () {
         //     const contractMasterData = this.getModel("contractModel").getData();
         //     contractMasterData.attachments = [];
@@ -358,18 +413,18 @@ sap.ui.define([
                     MessageToast.show("Please fill all mandatory fields.");
                     return;
                 }
+                 contractMasterData.status = "Draft";
 
             }
             else {
+                if (!this.validateControls(this.getModel("Details").getProperty("/dynamicControlIds"))) {
+                    MessageToast.show("Please fill all mandatory fields.");
+                    return;
+                }
                 contractMasterData.status = "Submitted";
             }
             contractMasterData.attribute_values = this.convertModelDataToAttributeValues();
-            if (sSaveType === "save") {
-                contractMasterData.status = "Draft";
-            }
-            else {
-                contractMasterData.status = "Submitted";
-            }
+         
             let that = this;
             if (!this.contractId) {
 
@@ -377,8 +432,14 @@ sap.ui.define([
 
                     const sId = await this.ODataPost("/Contracts", contractMasterData);
                     if (sId) {
-                        MessageToast.show("Contract Submitted Successfully.");
-                        this.getRouter().navTo("Contracts");
+                        MessageBox.success("Contract Submitted Successfully.", {
+                            actions: [MessageBox.Action.OK],
+                            onClose: function (oAction) {
+                                if (oAction === MessageBox.Action.OK) {
+                                    that.getRouter().navTo("Contracts");
+                                }
+                            }
+                        });
                     }
 
                 } catch (err) {
@@ -441,11 +502,13 @@ sap.ui.define([
             let isValid = true;
 
             idList.forEach(id => {
-                const control = this.byId(id);
+                let control = this.byId(id);
 
                 if (!control) {
-                    console.warn("Control not found:", id);
-                    return;
+                    control=sap.ui.getCore().byId(id);
+                    if (!control) {
+                    console.log("Control not found:", id);
+                    return;}
                 }
 
                 let value = null;
@@ -482,16 +545,42 @@ sap.ui.define([
         },
         clearValidationStates: function (idList) {
             idList.forEach(id => {
-                const control = this.byId(id);
-                if (!control) return;
-                // Controls differ: many support setValueState, others may not
+                let control = this.byId(id);
+                if (!control) {
+                    control=sap.ui.getCore().byId(id);
+                    if (!control) {
+                    console.log("Control not found:", id);
+                    return;}
+                }
                 if (control.setValueState) {
                     control.setValueState("None");
                     control.setValueStateText("");
                 }
-                // If you kept custom error markers (CSS, model flags), clear them here as well
+            
             });
-        }
+        },
+        onControlValueChange: function (oEvent) {
+    const oControl = oEvent.getSource();
+    let v = null;
+
+    // determine the control’s value
+    if (oControl.getValue) {
+        v = oControl.getValue();      // Input, ComboBox
+    } else if (oControl.getSelectedKey) {
+        v = oControl.getSelectedKey(); // ComboBox
+    } else if (oControl.getDateValue) {
+        v = oControl.getDateValue();   // DatePicker
+    } else if (oControl.getSelected) {
+        v = oControl.getSelected();    // CheckBox
+    }
+
+    // remove error only if value exists
+    if (v !== null && v !== "" && v !== undefined) {
+        oControl.setValueState("None");
+        oControl.setValueStateText("");
+    }
+}
+
 
 
 

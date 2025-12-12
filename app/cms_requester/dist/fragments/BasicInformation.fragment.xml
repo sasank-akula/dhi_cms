@@ -45,13 +45,6 @@
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
 
-            <Label text="Related Master Agreement"/>
-            <Input 
-                id="masterAgreementInput" 
-                placeholder="Enter reference ID" 
-                value="{contractModel>/MasterAgreementID}"
-                width="500px"
-            />
 
             <Label text="Project / Business Unit"/>
             <ComboBox 

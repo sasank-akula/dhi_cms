@@ -18,6 +18,12 @@ sap.ui.define([
 
         var data = context.getObject();
         var detailsModel = context.getModel("Details"); // named local model
+        let dynamicControlIds=context.getModel("Details").getProperty("/dynamicControlIds");
+        if(!dynamicControlIds){
+            context.getModel("Details").setProperty("/dynamicControlIds",[]);
+            dynamicControlIds=[];
+        }
+        debugger
         // defensive defaults
         data = data || {};
         data.AttributeType = data.AttributeType || "String";
@@ -40,7 +46,8 @@ sap.ui.define([
             case "string":
                 control = new Input(controlId, {
                     type: "Text",
-                    editable: "{appModel>/isFieldEditable}"
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 control.bindProperty("value", { path: 'Value', model: 'Details' });
                 break;
@@ -49,7 +56,8 @@ sap.ui.define([
             case "integer":
                 control = new Input(controlId, {
                     type: "Number",
-                    editable: "{appModel>/isFieldEditable}"
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 control.bindProperty("value", { path: 'Value', model: 'Details' });
                 break;
@@ -60,7 +68,8 @@ sap.ui.define([
                 }
                 control = new DatePicker(controlId, {
                     width: controlWidth,
-                    editable: "{appModel>/isFieldEditable}"
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 control.bindProperty("dateValue", { path: 'Value', model: 'Details' });
                 break;
@@ -75,8 +84,9 @@ sap.ui.define([
                 else{
                     data.Value=null;
                 }
-                control = new CheckBox(controlId, {
-                    editable: "{appModel>/isFieldEditable}"
+                control = new CheckBox(controlId, {text:"If Yes Tick Here.",
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 control.bindProperty("selected", { path: 'Value', model: 'Details' });
                 break;
@@ -90,7 +100,8 @@ sap.ui.define([
                     width: controlWidth,
                     showSecondaryValues: true,
                     selectedKey: "{Details>Value}",
-                    editable: "{appModel>/isFieldEditable}"
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 var oAssociationItems = new ListItem({
                     key: "{Details>ID}",
@@ -107,7 +118,8 @@ sap.ui.define([
                 // fallback to text input
                 control = new Input(controlId, {
                     type: "Text",
-                    editable: "{appModel>/isFieldEditable}"
+                    editable: "{appModel>/isFieldEditable}",
+                    change:"onControlValueChange"
                 });
                 control.bindProperty("value", { path: 'Value', model: 'Details' });
                 break;
@@ -124,8 +136,10 @@ sap.ui.define([
         });
         container.addStyleClass("sapUiTinyMargin");
         // important: set the binding context to the attribute context and the correct model name
+        if(data.IsMandatory){
         container.setBindingContext(context, "Details");
-
+        dynamicControlIds.push(controlId);}
+        context.getModel("Details").setProperty("/dynamicControlIds",dynamicControlIds);
         return container;
     };
 

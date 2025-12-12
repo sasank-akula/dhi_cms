@@ -141,14 +141,12 @@ sap.ui.define([
         clearAllFilters: function () {
             var oTable = this.byId("tblContracts");
             var oFilter = null;
-
             var aColumns = oTable.getColumns();
             for (var i = 0; i < aColumns.length; i++) {
                 oTable.filter(aColumns[i], null);
             }
             this.byId("tblContracts").getBinding("rows").filter(oFilter, "Application");
             this.byId("tblContracts").getBinding("rows").filter([]);
-
         },
 
         onTableFilter: function (oEvent) {

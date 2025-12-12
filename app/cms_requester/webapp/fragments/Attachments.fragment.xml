@@ -7,7 +7,7 @@
     xmlns:upload="sap.m.upload">
     <f:GridList class="sapUiMediumMarginTop sapUiMediumMarginBegin" width="96%">
         <f:GridListItem>
-            <Table id ="UploadSetTable" sticky ="ColumnHeaders,HeaderToolbar" width ="auto" mode ="MultiSelect" fixedLayout ="false" inset ="true" autoPopinMode ="true" hiddenInPopin ="None" items ="{ path : 'contractModel>/attachments'}" selectionChange ="onSelectionChange">
+            <Table id ="UploadSetTable" sticky ="ColumnHeaders,HeaderToolbar" width ="auto" mode ="Delete" delete=".onDeleteDocumentPress" fixedLayout ="false" inset ="true" autoPopinMode ="true" hiddenInPopin ="None" items ="{ path : 'contractModel>/attachments'}" selectionChange ="onSelectionChange">
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title text="Uploaded ({= ${/Attachments/$count}})" level="H2" />
@@ -19,7 +19,7 @@
                         </SearchField>
                         <ToolbarSeparator class="sapUiSmallMarginBeginEnd" />
                         <upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
-                        <Button id="downloadSelectedButton" text="Download" enabled="false" press="onDownloadFiles" />
+                        <Button id="downloadSelectedButton" text="Download" enabled="false" visible="false" press="onDownloadFiles" />
 
                     </OverflowToolbar>
                 </headerToolbar>
@@ -58,12 +58,7 @@
                             <Label text="Uploaded On" />
                         </header>
                     </Column>
-                    <Column id="Action">
-                        <header>
-                            <Label text="Action" />
-                        </header>
-                    </Column>
-
+                    
                 </columns>
                 <items>
 
@@ -73,7 +68,6 @@
                             <Text text="{contractModel>file_size} KB" />
                             <Text text="{contractModel>media_type}" />
                             <Text text="{contractModel>modifiedAt}" visible="{= %{contractModel>/ID}? true:false}"/>
-                            <Button class="sapUiTinyMarginBegin" type="Transparent" icon="sap-icon://decline" press="onRemoveFiles" />
                         </cells>
                     </ColumnListItem>
                     <!-- </plugins:UploadSetwithTable> -->

@@ -49,29 +49,7 @@
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
-            <Label text="Alias" required="true"/>
-            <Input 
-                id="contractaliasInput" 
-                placeholder="Enter contract title" 
-                value="{contractModel>/alias}"
-                width="500px" 
-                required="true"
-            />
-            <Label text="Description" required="true"/>
-            <Input 
-                id="contractdescriptionInput" 
-                placeholder="Enter contract title" 
-                value="{contractModel>/description}"
-                width="500px" 
-                required="true"
-            />
-            <Label text="Related Master Agreement"/>
-            <Input 
-                id="masterAgreementInput" 
-                placeholder="Enter reference ID" 
-                value="{contractModel>/MasterAgreementID}"
-                width="500px"
-            />
+
 
             <!-- <Label text="Project / Business Unit"/>
             <ComboBox 

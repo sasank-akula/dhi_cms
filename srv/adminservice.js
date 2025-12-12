@@ -22,4 +22,16 @@ module.exports = async function () {
     return grpTemplates;
   });
 
+  // Before handler to enforce unique attribute name
+  this.before(['CREATE', 'UPDATE'], 'Attributes', async (req) => {
+    const { name, ID } = req.data;
+    if (!name) return;
+
+    // Exclude current record on update
+    const where = ID ? { name, ID: { '!=': ID } } : { name };
+
+    const existing = await SELECT.one.from('com.dhi.cms.Attributes').where(where);
+    if (existing) return req.reject(400, 'Unique constraint violated: Attribute name must be unique.');
+  });
+
 }

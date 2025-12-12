@@ -19,14 +19,14 @@
                         </SearchField>
                         <ToolbarSeparator class="sapUiSmallMarginBeginEnd" />
                         <upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
-                        <Button id="downloadSelectedButton" text="{i18n>Assets_Download}" enabled="false" press="onDownloadFiles" />
+                        <Button id="downloadSelectedButton" text="Download" enabled="false" press="onDownloadFiles" />
 
                     </OverflowToolbar>
                 </headerToolbar>
                 <dependents>
-                    <plugins:UploadSetwithTable multiple="true" beforeInitiatingItemUpload="onBeforeInitiatingItemUpload" beforeUploadStarts="onBeforeUploadStarts" itemRenamed="onDocumentRenamedSuccess" uploadCompleted="onUploadCompleted" onActivated="onPluginActivated" cloudFilePickerEnabled="true" actions="uploadButton" fileTypes= "{appModel>/validAssetTypes}">
+                    <plugins:UploadSetwithTable multiple="true" beforeInitiatingItemUpload="onBeforeInitiatingItemUpload" beforeUploadStarts="onBeforeUploadStarts"  itemRenamed="onDocumentRenamedSuccess" uploadCompleted="onUploadCompleted" onActivated="onPluginActivated" cloudFilePickerEnabled="true" actions="uploadButton" fileTypes= "{appModel>/validAssetTypes}">
                         <plugins:rowConfiguration>
-                            <upload:UploadItemConfiguration fileNamePath="file_name" mediaTypePath="media_type" urlPath="file_url" previewablePath="previewable" isTrustedSourcePath="trustedSource"></upload:UploadItemConfiguration>
+                            <upload:UploadItemConfiguration fileNamePath="file_name" mediaTypePath="media_type" urlPath="file_url" previewablePath="previewable" isTrustedSourcePath="trustedSource" ></upload:UploadItemConfiguration>
                         </plugins:rowConfiguration>
                     </plugins:UploadSetwithTable>
                 </dependents>
@@ -53,7 +53,7 @@
                             <Label text="File Type" />
                         </header>
                     </Column>
-                    <Column id="uploadedOn">
+                    <Column id="uploadedOn" visible="{= %{contractModel>/ID}? true:false}">
                         <header>
                             <Label text="Uploaded On" />
                         </header>
@@ -69,10 +69,10 @@
 
                     <ColumnListItem>
                         <cells>
-                            <Link text="{contractModel>fileName}" press="openPreview" class="sapUiTinyMarginBottom"/>
-                            <Text text="{contractModel>fileSize}" />
-                            <Text text="{contractModel>mediaType}" />
-                            <Text text="{contractModel>uploadedOn}" />
+                            <Link text="{contractModel>file_name}" press="openPreview" class="sapUiTinyMarginBottom"/>
+                            <Text text="{contractModel>file_size} KB" />
+                            <Text text="{contractModel>media_type}" />
+                            <Text text="{contractModel>modifiedAt}" visible="{= %{contractModel>/ID}? true:false}"/>
                             <Button class="sapUiTinyMarginBegin" type="Transparent" icon="sap-icon://decline" press="onRemoveFiles" />
                         </cells>
                     </ColumnListItem>

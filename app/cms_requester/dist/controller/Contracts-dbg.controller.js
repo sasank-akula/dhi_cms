@@ -1,5 +1,6 @@
 
 sap.ui.define([
+    "./BaseController",
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
@@ -9,17 +10,20 @@ sap.ui.define([
     'sap/ui/model/FilterType',
     "sap/ui/core/Fragment",
     'sap/ui/export/Spreadsheet',
-        'sap/ui/export/library'
-], (Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet,exportLibrary) => {
+    'sap/ui/export/library',
+    "sap/ui/core/BusyIndicator"
+], (BaseController, Controller, MessageBox, MessageToast, TablePersoController, Filter, FilterOperator, FilterType, Fragment, Spreadsheet, exportLibrary,BusyIndicator) => {
     "use strict";
     var EdmType = exportLibrary.EdmType;
-    return Controller.extend("com.dhi.cms.cmsrequester.controller.Contracts", {
+    return BaseController.extend("com.dhi.cms.cmsrequester.controller.Contracts", {
         onInit() {
             this.getRouter().getRoute("Contracts").attachPatternMatched(this._onObjectMatched, this);
 
         },
-        getRouter: function () {
-            return this.getOwnerComponent().getRouter();
+         _onObjectMatched: function (oEvent) {
+            this._refreshTable();
+            this._setPersonalization();
+            this.clearAllFilters();
         },
         onGoBtnPress: function (oEvent) {
             let oFilterbar = this.byId("idFilterBar")
@@ -57,38 +61,6 @@ sap.ui.define([
             this.byId("tblContracts").getBinding("rows").filter([]);
             MessageToast.show("Filters cleared Sucessfully.")
         },
-        onCreateContract: function (sNavigationTarget) {
-            var oRouter = this.getOwnerComponent().getRouter();
-            var sNavigationTarget;
-            if (sNavigationTarget) {
-                oRouter.navTo(sNavigationTarget);
-            } else {
-                console.error("Navigation target not defined.");
-            }
-        },
-        onEditContract: async function (oEvent) {
-            const oSource = oEvent.getSource();
-            const oBindingContext = oSource.getBindingContext();
-            if (!oBindingContext) return;
-            const sID = oBindingContext.getProperty("ID");
-            const oModel = this.getView().getModel();
-
-            const sEntityPath = `/Contracts('${sID}')`;
-            let oContext = oModel.bindContext(sEntityPath, undefined, { $expand: "attribute_values" });
-            let oDetail = await oContext.requestObject().then(function (oData) {
-                console.log(oData);
-                return oData;
-            })
-            console.log("Server contract + attribute_values:", oDetail);
-            this.getView().getModel("contractModel").setData(oDetail);
-
-
-        },
-        _onObjectMatched: function (oEvent) {
-            this._refreshTable();
-            this._setPersonalization();
-            this.clearAllFilters();
-        },
         onExportData: function (event) {
             let table = this.byId("tblContracts");
             let binding = table.getBinding('rows');
@@ -100,7 +72,7 @@ sap.ui.define([
                 },
                 dataSource: binding,
                 fileName: 'Contracts.xlsx',
-                worker: false // We need to disable worker because we are using a MockServer as OData Service
+                worker: false 
             };
 
             let sheet = new Spreadsheet(settings);
@@ -156,40 +128,10 @@ sap.ui.define([
 
             return columns;
         },
-
-
-        onProductDelete: function (event) {
-            let oBundle = this.getResourceBundle();
-            let productHandler = ProductManager.getInstance();
-            let context = event.getSource().getBindingContext();
-            let { ID, name } = context.getObject();
-            MessageBox.warning(oBundle.getText("confirmDeleteProduct", [name]), {
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                emphasizedAction: MessageBox.Action.YES,
-                initialFocus: MessageBox.Action.NO,
-                onClose: (sAction) => {
-                    if (sAction === MessageBox.Action.YES) {
-                        productHandler.deleteProduct(ID).then(() => {
-                            this._refreshTable();
-                            MessageBox.success(oBundle.getText("productDeleted", [name]));
-                        }).catch((err) => {
-                            MessageBox.error(oBundle.getText("productDeleteError", [name]));
-                        });
-                    }
-                },
-                dependentOn: this.getView()
-            });
-        },
         _refreshTable: function () {
             this.byId("tblContracts").getBinding("rows").refresh();
         },
-        onProductEdit: function (event) {
-            let context = event.getSource().getBindingContext();
-            let { ID } = context.getObject();
-            this.getRouter().navTo("Create Products", {
-                productId: ID
-            });
-        },
+       
 
         onClearFilters: function () {
             this.byId("clearFilters").setEnabled(false);
@@ -294,9 +236,56 @@ sap.ui.define([
 
         onRowsUpdated: function () {
             var oTable = this.byId("tblContracts");
-            this.getModel("appModel").setProperty("/ProductCount", oTable.getBinding("rows").getLength());
-        }
+            this.getModel("appModel").setProperty("/ContractCount", oTable.getBinding("rows").getLength());
+        },
+        onCreateContract: function (sNavigationTarget) {
+            var sNavigationTarget;
+            if (sNavigationTarget) {
+                this.getRouter().navTo(sNavigationTarget);
+            } else {
+                console.error("Navigation target not defined.");
+            }
 
+        },
+        onDeleteContract: function (oEvent) {
+            const oView = this.getView();
+            const oButton = oEvent.getSource();
+            const oContext = oButton.getBindingContext(); 
+            if (!oContext) {
+                sap.m.MessageToast.show("No contract selected for delete.");
+                return;
+            }
+            const sAlias = oContext.getProperty("alias") || oContext.getProperty("contract_id") || "this contract";
+            const sConfirmText = `Are you sure you want to delete ${sAlias}?`;
+            MessageBox.confirm(sConfirmText, {
+                title: "Confirm delete",
+                onClose: (sAction) => {
+                    if (sAction !== sap.m.MessageBox.Action.OK) {
+                        return;
+                    }
+                    oView.setBusy(true);
+                    oContext.delete().then(() => {
+                        oView.setBusy(false);
+                        MessageToast.show("Contract deleted");
+                        const oModel = oView.getModel();
+                        try { oModel.refresh(true); } catch (e) {}
+                    }).catch((oError) => {
+                        oView.setBusy(false);
+                        const sMsg = (oError && oError.message) ? oError.message : "Delete failed";
+                        MessageBox.error("Failed to delete contract: " + sMsg);
+                        try { oView.getModel().refresh(true); } catch (e) { }
+                    });
+                }
+            });
+        },
+         onEditContract: function (event) {
+            let context = event.getSource().getBindingContext();
+            let { ID } = context.getObject();
+            this.getRouter().navTo("ContractDetails", {
+                contractId: ID
+            });
+            
+        },
 
     });
 });

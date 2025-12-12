@@ -6,7 +6,7 @@
       id="contractSimpleForm"
             editable="true"
             title="Contract Information"
-            width="98%"
+            
             maxContainerCols="1"
             layout="ResponsiveGridLayout"
             labelSpanL="4" labelSpanM="4" labelSpanS="12"
@@ -26,6 +26,7 @@
                 width="500px" 
                 required="true"
                 change="onControlValueChange"
+                editable="{appModel>/isFieldEditable}"
             />
 
             <Label text="Contract Number / Reference ID" visible="{= !!${contractModel>/ID} }"/>
@@ -60,6 +61,8 @@
                 width="500px" 
                 required="true"
                 change="onControlValueChange"
+                                editable="{appModel>/isFieldEditable}"
+
             />
             <Label text="Description" required="true"/>
             <Input 
@@ -69,11 +72,15 @@
                 width="500px" 
                 required="true"
                 change="onControlValueChange"
+                                editable="{appModel>/isFieldEditable}"
+
             />
             <Label text="Start Date"></Label>
-            <DatePicker value="{contractModel>/start_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" ></DatePicker>
+            <DatePicker value="{contractModel>/start_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" editable="{appModel>/isFieldEditable}"
+ ></DatePicker>
             <Label text="Expiry Date"></Label>
-            <DatePicker value="{contractModel>/end_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px"></DatePicker>
+            <DatePicker value="{contractModel>/end_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" editable="{appModel>/isFieldEditable}"
+></DatePicker>
         </f:content>
     </f:SimpleForm>
 </core:FragmentDefinition>

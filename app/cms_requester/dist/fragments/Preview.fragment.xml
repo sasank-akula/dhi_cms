@@ -3,19 +3,14 @@
   xmlns:f="sap.ui.layout.form"
   xmlns:layout="sap.ui.layout">
     
-  <ScrollContainer height="80vh" width="100%" vertical="true" horizontal="false">
-        <VBox class="previewDialogVBox" width="100%" renderType="Bare">
-
-          <!-- Basic Information Panel -->
-          <Panel headerText="Basic Information" expandable="false" class="previewPanel">
+  <ScrollContainer height="80vh" width="100%"  vertical="true" horizontal="false">
+ 
+  <Panel headerText="Basic Information" width="98%" expandable="false" >
             <f:SimpleForm
-              layout="ResponsiveGridLayout"
-              editable="false"
-              class="previewForm"
-              labelSpanL="4" labelSpanM="4" labelSpanS="12"
-              adjustLabelSpan="true"
-              maxContainerCols="1"
-              columnsXL="1" columnsL="1" columnsM="1">
+               editable= "true"
+            layout= "ColumnLayout"
+            
+            >
 
               <Label text="Contract Title"/>
               <Text text="{contractModel>/name}" />
@@ -37,9 +32,9 @@
 
             </f:SimpleForm>
           </Panel>
+        <VBox id="previewDialogVBox" alignContent="Center" justifyContent="Center" >
 
-          <!-- Attribute Groups -->
-          <List
+          <!-- <List
             items="{Details>/AttributeGroups}"
             showSeparators="None"
             width="100%"
@@ -52,17 +47,15 @@
                   <VBox width="100%">
 
 
-                      <!-- iterate attributes using a nested List bound to Attributes -->
                       <List items="{Details>Attributes}" width="100%" showSeparators="None">
                         <items>
                           <CustomListItem type="Inactive">
                             <HBox fitContainer="true" width="100%" justifyContent="SpaceAround">
-                              <VBox width="45%" alignItems="End">
+                              <VBox width="45%" alignItems="Start">
                                 <Label text="{Details>Attribute_Name}" showColon="true" wrapping="false" class="attributeLabel"/>
                               </VBox>
 
                               <VBox width="55%" justifyContent="Start">
-                                <!-- Use formatter to produce a friendly display depending on AttributeType -->
                                 <Text
                                   text="{parts: [{ path: 'Details>Value' }, { path: 'Details>AttributeType' }], formatter: '.formatAttribute'}"
                                   wrapping="true"
@@ -77,8 +70,10 @@
                 </Panel>
               </CustomListItem>
             </items>
-          </List>
+          </List> -->
 
         </VBox>
+    
       </ScrollContainer>
+      
 </core:FragmentDefinition>

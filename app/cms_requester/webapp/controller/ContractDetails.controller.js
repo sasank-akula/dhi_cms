@@ -20,8 +20,9 @@ sap.ui.define([
             BusyIndicator.show(0);
             this.basicVaditionIds = ["contractTitleInput", "contractTypeSelect", "contractaliasInput", "contractdescriptionInput"];
             this.clearValidationStates(this.basicVaditionIds);
-            if(this.getModel("Details").getProperty("/dynamicControlIds")){
-            this.clearValidationStates(this.getModel("Details").getProperty("/dynamicControlIds"));}
+            if (this.getModel("Details").getProperty("/dynamicControlIds")) {
+                this.clearValidationStates(this.getModel("Details").getProperty("/dynamicControlIds"));
+            }
             // this.getModel("Details").setData();
             this._SelectedContractType;
             const oArgs = oEvent.getParameter("arguments");
@@ -73,6 +74,14 @@ sap.ui.define([
             this.contractData = oDetail;
             this.getModel("contractModel").setData(oDetail);
             this.getModel("appModel").setProperty("/status", oDetail.status);
+            if (oDetail.status === "Draft") {
+                this.getModel("appModel").setProperty("/isFieldEditable", true)
+                this.getModel("appModel").setProperty("/attachmentsMode", "Delete")
+            }
+            else if (oDetail.status === "Submitted") {
+                this.getModel("appModel").setProperty("/isFieldEditable", false)
+                this.getModel("appModel").setProperty("/attachmentsMode", "None")
+            }
 
         },
 
@@ -111,6 +120,9 @@ sap.ui.define([
             }
             if (sSelectedKey != "Details") {
                 this._setDefaultFirstDetailsSectionTab();
+            }
+            if (sSelectedKey != "ContractPrev") {
+                this._previewLayout();
             }
             this._SelectedContractType = sSelectedContractType;
             return true;
@@ -408,15 +420,14 @@ sap.ui.define([
         // },
         handleSaveandSubmitContractDetails: async function (sSaveType) {
             const contractMasterData = this.getModel("contractModel").getData();
-            if (sSaveType === "save") {
-                if (!this.validateControls(this.basicVaditionIds)) {
-                    MessageToast.show("Please fill all mandatory fields.");
-                    return;
-                }
-                 contractMasterData.status = "Draft";
 
+            if (!this.validateControls(this.basicVaditionIds)) {
+                MessageToast.show("Please fill all mandatory fields.");
+                return;
             }
-            else {
+            contractMasterData.status = "Draft";
+
+            if (sSaveType === "submit") {
                 if (!this.validateControls(this.getModel("Details").getProperty("/dynamicControlIds"))) {
                     MessageToast.show("Please fill all mandatory fields.");
                     return;
@@ -424,7 +435,7 @@ sap.ui.define([
                 contractMasterData.status = "Submitted";
             }
             contractMasterData.attribute_values = this.convertModelDataToAttributeValues();
-         
+
             let that = this;
             if (!this.contractId) {
 
@@ -450,7 +461,7 @@ sap.ui.define([
             else {
                 console.log(this.getAppModulePathBaseURL());
                 $.ajax({
-                    url: this.getAppModulePathBaseURL()+"/contracts/Contracts('" + this.contractId + "')",
+                    url:this.getAppModulePathBaseURL()+ "/contracts/Contracts('" + this.contractId + "')",
                     method: "PUT",
                     contentType: "application/json",
                     data: JSON.stringify(contractMasterData),
@@ -505,10 +516,11 @@ sap.ui.define([
                 let control = this.byId(id);
 
                 if (!control) {
-                    control=sap.ui.getCore().byId(id);
+                    control = sap.ui.getCore().byId(id);
                     if (!control) {
-                    console.log("Control not found:", id);
-                    return;}
+                        console.log("Control not found:", id);
+                        return;
+                    }
                 }
 
                 let value = null;
@@ -547,42 +559,82 @@ sap.ui.define([
             idList.forEach(id => {
                 let control = this.byId(id);
                 if (!control) {
-                    control=sap.ui.getCore().byId(id);
+                    control = sap.ui.getCore().byId(id);
                     if (!control) {
-                    console.log("Control not found:", id);
-                    return;}
+                        console.log("Control not found:", id);
+                        return;
+                    }
                 }
                 if (control.setValueState) {
                     control.setValueState("None");
                     control.setValueStateText("");
                 }
-            
+
             });
         },
         onControlValueChange: function (oEvent) {
-    const oControl = oEvent.getSource();
-    let v = null;
+            const oControl = oEvent.getSource();
+            let v = null;
 
-    // determine the control’s value
-    if (oControl.getValue) {
-        v = oControl.getValue();      // Input, ComboBox
-    } else if (oControl.getSelectedKey) {
-        v = oControl.getSelectedKey(); // ComboBox
-    } else if (oControl.getDateValue) {
-        v = oControl.getDateValue();   // DatePicker
-    } else if (oControl.getSelected) {
-        v = oControl.getSelected();    // CheckBox
-    }
+            // determine the control’s value
+            if (oControl.getValue) {
+                v = oControl.getValue();      // Input, ComboBox
+            } else if (oControl.getSelectedKey) {
+                v = oControl.getSelectedKey(); // ComboBox
+            } else if (oControl.getDateValue) {
+                v = oControl.getDateValue();   // DatePicker
+            } else if (oControl.getSelected) {
+                v = oControl.getSelected();    // CheckBox
+            }
 
-    // remove error only if value exists
-    if (v !== null && v !== "" && v !== undefined) {
-        oControl.setValueState("None");
-        oControl.setValueStateText("");
-    }
-}
+            // remove error only if value exists
+            if (v !== null && v !== "" && v !== undefined) {
+                oControl.setValueState("None");
+                oControl.setValueStateText("");
+            }
+        },
+        _previewLayout: function () {
+    const oView = this.getView();
+    const oDetailsModel = oView.getModel("Details");
+    const aGroups = oDetailsModel.getProperty("/AttributeGroups");
 
+    const oContainer = oView.byId("previewDialogVBox"); 
+    // <VBox id="dynamicAttributeContainer" /> must exist in your XML view
 
+    oContainer.removeAllItems();
 
+    aGroups.forEach(group => {
 
+        // Create Panel for each group
+        const oPanel = new sap.m.Panel({
+            headerText: group.Attribute_Group_Name,
+            expandable: false,
+            expanded: true,
+            width: "98%"
+        });
+
+        // Create SimpleForm for group attributes
+        const oForm = new sap.ui.layout.form.SimpleForm({
+            editable: true,
+            layout: "ColumnLayout"
+        });
+
+        group.Attributes.forEach(attr => {
+            // Label
+            oForm.addContent(new sap.m.Label({
+                text: attr.Attribute_Name
+            }));
+
+            // Value Text (formatted)
+            oForm.addContent(new sap.m.Text({
+                text: this.formatAttribute(attr.Value, attr.AttributeType)
+            }));
+        });
+
+        oPanel.addContent(oForm);
+        oPanel.addStyleClass("groupPanelClass");
+        oContainer.addItem(oPanel);
+    });
+},
     });
 });

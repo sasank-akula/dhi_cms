@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     xmlns:l="sap.ui.layout">
    
-                <Page id="createProductsPage" showHeader="false">
+                <Page id="createProductsPage" title="Contract Details" showHeader="true">
                     <content>
 
                         <IconTabBar id="iconTabBar" class="noBottomLine" expandable="false" backgroundDesign="Transparent" headerMode="Inline" selectedKey="BasicInfo" select="onTabSelect">
@@ -45,8 +45,8 @@
                                 <IconTabFilter key="ContractPrev" text="Contract Preview" visible="{= ${appModel>/isProductPreviewVisible} &amp;&amp; (${appModel>/userRole} === 'admin' || ${appModel>/userRole} === 'catManager')}">
                                     <OverflowToolbar class="customToolbar" design="Transparent" height="3rem">
                                         <ToolbarSpacer/>
-                                        <Button text="Submit" type="Emphasized" icon="sap-icon://save" press="handleSaveandSubmitContractDetails('submit')" />
-                                        <Button text="Save as Draft" type="Emphasized" icon="sap-icon://notes" press="handleSaveandSubmitContractDetails('save')" />
+                                        <Button text="Submit" type="Emphasized" visible="{appModel>/isFieldEditable}" icon="sap-icon://save" press="handleSaveandSubmitContractDetails('submit')" />
+                                        <Button text="Save as Draft" type="Neutral" visible="{appModel>/isFieldEditable}" icon="sap-icon://notes" press="handleSaveandSubmitContractDetails('save')" />
                                         <Button class="sapUiTinyMarginBegin" text="Cancel" icon="sap-icon://decline" press="onNavigation('Contracts')"/>
 
                                     </OverflowToolbar>

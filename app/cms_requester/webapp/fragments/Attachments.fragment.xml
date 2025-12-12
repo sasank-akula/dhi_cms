@@ -7,7 +7,7 @@
     xmlns:upload="sap.m.upload">
     <f:GridList class="sapUiMediumMarginTop sapUiMediumMarginBegin" width="96%">
         <f:GridListItem>
-            <Table id ="UploadSetTable" sticky ="ColumnHeaders,HeaderToolbar" width ="auto" mode ="Delete" delete=".onDeleteDocumentPress" fixedLayout ="false" inset ="true" autoPopinMode ="true" hiddenInPopin ="None" items ="{ path : 'contractModel>/attachments'}" selectionChange ="onSelectionChange">
+            <Table id ="UploadSetTable" sticky ="ColumnHeaders,HeaderToolbar" width ="auto" mode ="{appModel>/attachmentsMode}"  delete=".onDeleteDocumentPress" fixedLayout ="false" inset ="true" autoPopinMode ="true" hiddenInPopin ="None" items ="{ path : 'contractModel>/attachments'}" selectionChange ="onSelectionChange">
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title text="Uploaded ({= ${/Attachments/$count}})" level="H2" />
@@ -18,7 +18,7 @@
                             </layoutData>
                         </SearchField>
                         <ToolbarSeparator class="sapUiSmallMarginBeginEnd" />
-                        <upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
+                        <upload:ActionsPlaceholder id="uploadButton" visible="{appModel>/isFieldEditable}" placeholderFor="UploadButtonPlaceholder" />
                         <Button id="downloadSelectedButton" text="Download" enabled="false" visible="false" press="onDownloadFiles" />
 
                     </OverflowToolbar>

@@ -54,13 +54,11 @@ sap.ui.define([
             let oTable = this.byId("tblContracts");
             let oBinding = oTable.getBinding("rows");
             oBinding.filter(aFilters);
+            this.byId("clearFilters").setEnabled(true);
             MessageToast.show("Filters Applied Sucessfully.")
 
         },
-        onClearFilters: function () {
-            this.byId("tblContracts").getBinding("rows").filter([]);
-            MessageToast.show("Filters cleared Sucessfully.")
-        },
+
         onExportData: function (event) {
             let table = this.byId("tblContracts");
             let binding = table.getBinding('rows');
@@ -147,6 +145,39 @@ sap.ui.define([
             }
             this.byId("tblContracts").getBinding("rows").filter(oFilter, "Application");
             this.byId("tblContracts").getBinding("rows").filter([]);
+            const oFilterBar = this.byId("idFilterBar");
+
+    if (!oFilterBar) {
+        console.warn("FilterBar not found");
+        return;
+    }
+             const aFilterItems = oFilterBar.getFilterGroupItems();
+
+    aFilterItems.forEach(item => {
+        const oControl = item.getControl();
+
+        if (!oControl) return;
+
+        // Reset Input
+        if (oControl.setValue) {
+            oControl.setValue("");
+        }
+
+        // Reset MultiComboBox
+        if (oControl.setSelectedKeys) {
+            oControl.setSelectedKeys([]);
+        }
+
+        // Reset DatePicker (if you add one later)
+        if (oControl.setDateValue) {
+            oControl.setDateValue(null);
+        }
+
+        // Reset Checkboxes (if added later)
+        if (oControl.setSelected) {
+            oControl.setSelected(false);
+        }
+    });
         },
 
         onTableFilter: function (oEvent) {
@@ -276,13 +307,23 @@ sap.ui.define([
                 }
             });
         },
-         onEditContract: function (event) {
+        onEditContract: function (event) {
             let context = event.getSource().getBindingContext();
             let { ID } = context.getObject();
             this.getRouter().navTo("ContractDetails", {
                 contractId: ID
             });
+             
+
             
+        },
+        onViewContract: function (event) {
+            let context = event.getSource().getBindingContext();
+            let { ID } = context.getObject();
+            this.getRouter().navTo("ContractDetails", {
+                contractId: ID
+            });
+           
         },
 
     });

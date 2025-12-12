@@ -6,7 +6,7 @@
       id="contractSimpleForm"
             editable="true"
             title="Contract Information"
-            width="98%"
+            
             maxContainerCols="1"
             layout="ResponsiveGridLayout"
             labelSpanL="4" labelSpanM="4" labelSpanS="12"
@@ -25,6 +25,8 @@
                 value="{contractModel>/name}"
                 width="500px" 
                 required="true"
+                change="onControlValueChange"
+                editable="{appModel>/isFieldEditable}"
             />
 
             <Label text="Contract Number / Reference ID" visible="{= !!${contractModel>/ID} }"/>
@@ -35,6 +37,7 @@
                 editable="false"
                 width="500px"
                 visible="{= !!${contractModel>/ID} }"
+                change="onControlValueChange"
             />
 
             <Label text="Contract Type" required="true"/>
@@ -46,26 +49,38 @@
                 width="500px"
                 editable="{= !${contractModel>/ID} }"
                 required="true"
+                change="onControlValueChange"
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
+            <Label text="Alias" required="true"/>
+            <Input 
+                id="contractaliasInput" 
+                placeholder="Enter contract title" 
+                value="{contractModel>/alias}"
+                width="500px" 
+                required="true"
+                change="onControlValueChange"
+                                editable="{appModel>/isFieldEditable}"
 
+            />
+            <Label text="Description" required="true"/>
+            <Input 
+                id="contractdescriptionInput" 
+                placeholder="Enter contract title" 
+                value="{contractModel>/description}"
+                width="500px" 
+                required="true"
+                change="onControlValueChange"
+                                editable="{appModel>/isFieldEditable}"
 
-            <!-- <Label text="Project / Business Unit"/>
-            <ComboBox 
-                id="businessUnitSelect" 
-                selectedKey="{contractModel>/BusinessUnitID}" 
-                items="{path: 'contractModel>/ValidBusinessUnits'}"
-                width="500px"
-            >
-                <core:Item key="{contractModel>ID}" text="{contractModel>Name}" />
-            </ComboBox> -->
+            />
             <Label text="Start Date"></Label>
-            <DatePicker                 width="500px"
-></DatePicker>
-            <Label text="Expiry Date"></Label>
-            <DatePicker                 width="500px"
+            <DatePicker value="{contractModel>/start_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" editable="{appModel>/isFieldEditable}"
  ></DatePicker>
+            <Label text="Expiry Date"></Label>
+            <DatePicker value="{contractModel>/end_date}" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" width="500px" editable="{appModel>/isFieldEditable}"
+></DatePicker>
         </f:content>
     </f:SimpleForm>
 </core:FragmentDefinition>

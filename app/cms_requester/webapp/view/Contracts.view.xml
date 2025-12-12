@@ -53,7 +53,7 @@
 
                 <table:columns >
                     <!-- ID -->
-                    <table:Column id="col_id" sortProperty="ID" filterProperty="ID" >
+                    <table:Column id="col_id" sortProperty="ID" filterProperty="ID" resizable="true" autoResizable="true">
                         <Label text="ID" wrapping="true"/>
                         <table:template>
                             <Text text="{ID}"/>
@@ -61,7 +61,7 @@
                     </table:Column>
 
                     <!-- alias -->
-                    <table:Column id="col_alias" sortProperty="alias" filterProperty="alias" width="10rem">
+                    <table:Column id="col_alias" sortProperty="alias" filterProperty="alias" resizable="true" autoResizable="true">
                         <Label text="Contract Name" wrapping="true"/>
                         <table:template>
                             <Text text="{alias}" wrapping="true"/>
@@ -77,14 +77,14 @@
                     </table:Column> -->
 
                     <!-- description -->
-                    <table:Column id="col_description" sortProperty="description" filterProperty="description" width="12rem">
+                    <table:Column id="col_description" sortProperty="description" filterProperty="description" resizable="true" autoResizable="true">
                         <Label text="Description"/>
                         <table:template>
-                            <Text text="{description}" wrapping="true"/>
+                            <Text text="{description}" />
                         </table:template>
                     </table:Column>
                     <!-- templates_ID -->
-                    <table:Column id="col_templates_id" sortProperty="templates/name" filterProperty="templates/name" width="8rem">
+                    <table:Column id="col_templates_id" sortProperty="templates/name" filterProperty="templates/name" resizable="true" autoResizable="true">
                         <Label text="Contract Type"/>
                         <table:template>
                             <Text text="{templates/name}" wrapping="true"/>
@@ -92,7 +92,7 @@
                     </table:Column>
 
                     <!-- start_date -->
-                    <table:Column id="col_start_date" sortProperty="start_date" filterProperty="start_date" width="9rem">
+                    <table:Column id="col_start_date" sortProperty="start_date" filterProperty="start_date" width="8.5rem">
                         <Label text="Start Date"/>
                         <table:template>
                             <Text text="{parts: [{path: 'start_date'}], formatter: '.formatter.formatDate'}" />
@@ -100,7 +100,7 @@
                     </table:Column>
 
                     <!-- end_date -->
-                    <table:Column id="col_end_date" sortProperty="end_date" filterProperty="end_date" width="9rem">
+                    <table:Column id="col_end_date" sortProperty="end_date" filterProperty="end_date" width="8.5rem">
                         <Label text="End Date"/>
                         <table:template>
                             <Text text="{parts: [{path: 'end_date'}], formatter: '.formatter.formatDate'}" />

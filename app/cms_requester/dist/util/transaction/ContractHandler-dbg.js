@@ -16,13 +16,14 @@ sap.ui.define([
       };
       this.isBound = false;
       this.activeContext = null;
+      this.mandatoryFields = [];
       this.attributeDataFetchedMap = {};
     },
 
     initializeBinding: function (oModel, oController) {
       this.controller = oController;
       this.model = oModel;
-      // Bind the collection with expands you need for lists
+    
       this.contractBinding = this.model.bindList(
         `/${this.entityName}`,
         null,

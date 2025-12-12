@@ -450,7 +450,7 @@ sap.ui.define([
             else {
                 console.log(this.getAppModulePathBaseURL());
                 $.ajax({
-                    url: "/contracts/Contracts('" + this.contractId + "')",
+                    url: this.getAppModulePathBaseURL()+"/contracts/Contracts('" + this.contractId + "')",
                     method: "PUT",
                     contentType: "application/json",
                     data: JSON.stringify(contractMasterData),

@@ -102,6 +102,9 @@
 			},
 			"appModel": {
 				"type": "sap.ui.model.json.JSONModel"
+			},
+			"ComboBoxModel": {
+				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
 		"resources": {

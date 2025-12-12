@@ -24,29 +24,34 @@
                 placeholder="Enter contract title" 
                 value="{contractModel>/name}"
                 width="500px" 
+                required="true"
             />
 
-            <Label text="Contract Number / Reference ID"/>
+            <Label text="Contract Number / Reference ID" visible="{= !!${contractModel>/ID} }"/>
             <Input 
                 id="contractNumberInput" 
                 placeholder="Enter contract ID" 
-                value="{contractModel>/ContractNumber}" 
+                value="{contractModel>/ID}" 
                 editable="false"
                 width="500px"
+                visible="{= !!${contractModel>/ID} }"
             />
 
             <Label text="Contract Type" required="true"/>
             <ComboBox 
                 id="contractTypeSelect" 
+                placeholder="Please select"
                 selectedKey="{contractModel>/templates_ID}" 
                 items="{path: '/Templates'}"
                 width="500px"
+                editable="{= !${contractModel>/ID} }"
+                required="true"
             >
                 <core:Item key="{ID}" text="{name}" />
             </ComboBox>
 
 
-            <Label text="Project / Business Unit"/>
+            <!-- <Label text="Project / Business Unit"/>
             <ComboBox 
                 id="businessUnitSelect" 
                 selectedKey="{contractModel>/BusinessUnitID}" 
@@ -54,7 +59,13 @@
                 width="500px"
             >
                 <core:Item key="{contractModel>ID}" text="{contractModel>Name}" />
-            </ComboBox>
+            </ComboBox> -->
+            <Label text="Start Date"></Label>
+            <DatePicker                 width="500px"
+></DatePicker>
+            <Label text="Expiry Date"></Label>
+            <DatePicker                 width="500px"
+ ></DatePicker>
         </f:content>
     </f:SimpleForm>
 </core:FragmentDefinition>
